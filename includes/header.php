@@ -123,7 +123,9 @@
           <?php
           if (!isset($_SESSION['user_id'])) {
             echo "<a href='#contact' class='btn btn-light' style='margin-right: 10px;'>Contact</a>";
-            echo "<a href='#' class='btn btn-outline-light'>Book Appointment</a>";
+            echo "<a href='/vehicare_db/register.php' class='btn btn-outline-light' style='margin-right: 10px;'>Register</a>";
+            echo "<a href='#' class='btn btn-outline-light' style='margin-right: 10px;'>Book Appointment</a>";
+            echo "<a href='/vehicare_db/login.php' class='btn btn-warning' style='background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%); border: none; color: #fff; font-weight: 600;'>Sign In</a>";
           } else {
             echo "<span class='me-3' style='color: #fff;'>{$_SESSION['email']}</span>";
             echo "<a href='/vehicare_db/logout.php' class='btn btn-outline-light'>Logout</a>";
