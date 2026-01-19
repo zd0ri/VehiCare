@@ -11,7 +11,7 @@
     crossorigin="anonymous" referrerpolicy="no-referrer" />
  
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
-  <link href="/vehicare_db/includes/style/style.css" rel="stylesheet">
+  <link href="/vehicare_db/includes/style/style.css?v=<?php echo time(); ?>" rel="stylesheet">
   <?php
   $isAdminPage = strpos($_SERVER['REQUEST_URI'], '/admins/') !== false;
   if ($isAdminPage) {

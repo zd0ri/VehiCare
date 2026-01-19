@@ -19,7 +19,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $phone = isset($_POST['phone']) ? trim($_POST['phone']) : '';
     $password = isset($_POST['password']) ? $_POST['password'] : '';
     $confirm_password = isset($_POST['confirm_password']) ? $_POST['confirm_password'] : '';
-    $role = isset($_POST['role']) ? $_POST['role'] : 'client';
+    $role = 'client'; // Only clients can register, staff and admin are created by admin
 
     // Custom validation
     if (empty($username)) {
@@ -70,10 +70,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $errors[] = "Please confirm your password.";
     } elseif ($password !== $confirm_password) {
         $errors[] = "Passwords do not match.";
-    }
-
-    if (!in_array($role, ['client', 'staff', 'admin'])) {
-        $errors[] = "Invalid role selected.";
     }
 
     // Check if username or email already exists
@@ -408,24 +404,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <?php endif; ?>
 
             <form method="POST" action="" id="registerForm" novalidate>
-                <div class="form-group">
-                    <label>Select Role *</label>
-                    <div class="role-selector">
-                        <div class="role-option show">
-                            <input type="radio" id="role_client" name="role" value="client" checked>
-                            <label for="role_client" class="role-label"><i class="fas fa-user"></i> Client</label>
-                        </div>
-                        <div class="role-option show">
-                            <input type="radio" id="role_staff" name="role" value="staff">
-                            <label for="role_staff" class="role-label"><i class="fas fa-wrench"></i> Staff</label>
-                        </div>
-                        <div class="role-option show">
-                            <input type="radio" id="role_admin" name="role" value="admin">
-                            <label for="role_admin" class="role-label"><i class="fas fa-shield-alt"></i> Admin</label>
-                        </div>
-                    </div>
-                </div>
-
                 <div class="form-row">
                     <div class="form-group">
                         <label for="username">Username *</label>

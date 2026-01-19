@@ -1,9 +1,9 @@
 /* VehiCare System - Main Stylesheet */
 
 :root {
-  --primary-color: #1a3a52;
-  --secondary-color: #2d5a7b;
-  --accent-color: #e74c3c;
+  --primary-color: #d4794a;
+  --secondary-color: #e8934b;
+  --accent-color: #2c5aa0;
   --success-color: #27ae60;
   --warning-color: #f39c12;
   --danger-color: #e74c3c;
@@ -28,7 +28,7 @@ body {
 
 /* Hero Section */
 .hero {
-  background: linear-gradient(135deg, #1a3a52 0%, #2d5a7b 100%);
+  background: linear-gradient(135deg, #d4794a 0%, #e8934b 100%);
   color: #fff;
   padding: 80px 20px;
   min-height: 600px;
@@ -170,7 +170,7 @@ body {
 
 /* Appointments Section */
 .appointments-section {
-  background: linear-gradient(135deg, #f8f9fa 0%, #e8eef5 100%);
+  background: linear-gradient(135deg, #fef3e6 0%, #fae8d8 100%);
   padding: 80px 20px;
 }
 
@@ -216,7 +216,7 @@ body {
 .form-group textarea:focus {
   outline: none;
   border-color: var(--secondary-color);
-  box-shadow: 0 0 0 3px rgba(45, 90, 123, 0.1);
+  box-shadow: 0 0 0 3px rgba(232, 147, 75, 0.1);
 }
 
 /* Why Choose Us */
@@ -262,7 +262,7 @@ body {
 
 /* Testimonials Section */
 .testimonials-section {
-  background: linear-gradient(135deg, #1a3a52 0%, #2d5a7b 100%);
+  background: linear-gradient(135deg, #2c5aa0 0%, #3a6bb6 100%);
   color: #fff;
   padding: 80px 20px;
 }

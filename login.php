@@ -45,6 +45,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             if ($user['status'] !== 'active') {
                 $errors[] = "Your account is inactive. Please contact administration.";
             } elseif (password_verify($password, $user['password'])) {
+                // Update last login timestamp
+                $update_login = "UPDATE users SET last_login = NOW() WHERE user_id = " . $user['user_id'];
+                $conn->query($update_login);
+
                 // Set session variables
                 $_SESSION['user_id'] = $user['user_id'];
                 $_SESSION['email'] = $user['email'];
@@ -97,7 +101,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
         body {
             font-family: 'Poppins', sans-serif;
-            background: linear-gradient(135deg, #1a3a52 0%, #2d5a7b 100%);
+            background: linear-gradient(135deg, #f5a623 0%, #f5a623 50%, #ff6b6b 100%);
             min-height: 100vh;
             display: flex;
             align-items: center;
@@ -381,13 +385,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     <i class="fas fa-sign-in-alt"></i> Sign In
                 </button>
             </form>
-
-            <div style="margin-top: 20px; text-align: center; padding: 15px; background: #f0f8ff; border-radius: 8px; border-left: 4px solid #0066cc;">
-                <p style="margin: 0; font-size: 13px; color: #333;">
-                    <strong>Demo Credentials:</strong><br>
-                    Email: admin@vehicare.com | Password: admin123
-                </p>
-            </div>
         </div>
 
         <div class="login-footer">
