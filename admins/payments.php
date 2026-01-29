@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 require_once __DIR__ . '/../includes/config.php';
 
@@ -9,7 +9,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
 
 include __DIR__ . '/../includes/adminHeader.php';
 
-// Fetch payments/invoices
+
 $paymentsQuery = $conn->query("
   SELECT i.*, a.appointment_id, c.full_name
   FROM invoices i
@@ -31,7 +31,7 @@ $paymentsQuery = $conn->query("
 </div>
 
 <div class="admin-main-content">
-  <h1 style="color: #1a3a52; margin-bottom: 20px;">Manage Payments & Invoices</h1>
+  <h1 style="color: 
   
   <div class="dashboard-stats" style="margin-bottom: 30px;">
     <div class="stat-card">
@@ -79,9 +79,9 @@ $paymentsQuery = $conn->query("
           if ($paymentsQuery && $paymentsQuery->num_rows > 0) {
             while ($invoice = $paymentsQuery->fetch_assoc()) {
               echo "<tr>
-                <td>#{$invoice['invoice_id']}</td>
+                <td>
                 <td>{$invoice['full_name']}</td>
-                <td>#{$invoice['appointment_id']}</td>
+                <td>
                 <td>\${$invoice['total_labor']}</td>
                 <td>\${$invoice['total_parts']}</td>
                 <td><strong>\${$invoice['grand_total']}</strong></td>
@@ -105,3 +105,4 @@ $paymentsQuery = $conn->query("
 </div>
 
 <?php include __DIR__ . '/../includes/footer.php'; ?>
+

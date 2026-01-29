@@ -8,14 +8,54 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
     exit;
 }
 
-// Get statistics
-$clientCount = $conn->query("SELECT COUNT(*) as count FROM clients")->fetch_assoc()['count'];
-$vehicleCount = $conn->query("SELECT COUNT(*) as count FROM vehicles")->fetch_assoc()['count'];
-$appointmentCount = $conn->query("SELECT COUNT(*) as count FROM appointments WHERE status = 'Pending'")->fetch_assoc()['count'];
-$revenueResult = $conn->query("SELECT SUM(grand_total) as total FROM invoices")->fetch_assoc();
-$totalRevenue = number_format($revenueResult['total'] ?? 0, 2);
-$totalServices = $conn->query("SELECT COUNT(*) as count FROM services")->fetch_assoc()['count'];
-$totalStaff = $conn->query("SELECT COUNT(*) as count FROM staff")->fetch_assoc()['count'];
+// Get comprehensive statistics
+$stats = [
+    'total_clients' => $conn->query("SELECT COUNT(*) as count FROM users WHERE role = 'client' AND status = 'active'")->fetch_assoc()['count'],
+    'total_appointments' => $conn->query("SELECT COUNT(*) as count FROM appointments")->fetch_assoc()['count'],
+    'pending_appointments' => $conn->query("SELECT COUNT(*) as count FROM appointments WHERE status IN ('pending', 'confirmed')")->fetch_assoc()['count'],
+    'completed_appointments' => $conn->query("SELECT COUNT(*) as count FROM appointments WHERE status = 'completed'")->fetch_assoc()['count'],
+    'total_vehicles' => $conn->query("SELECT COUNT(*) as count FROM vehicles")->fetch_assoc()['count'],
+    'total_services' => $conn->query("SELECT COUNT(*) as count FROM services")->fetch_assoc()['count'],
+    'total_staff' => $conn->query("SELECT COUNT(*) as count FROM users WHERE role = 'staff' AND status = 'active'")->fetch_assoc()['count'],
+    'total_parts' => $conn->query("SELECT COUNT(*) as count FROM parts")->fetch_assoc()['count'],
+    'queue_pending' => $conn->query("SELECT COUNT(*) as count FROM queue_management WHERE status IN ('waiting', 'in-service')")->fetch_assoc()['count'],
+    'unpaid_invoices' => $conn->query("SELECT COUNT(*) as count FROM invoices WHERE status NOT IN ('paid', 'cancelled')")->fetch_assoc()['count'],
+    'total_revenue' => $conn->query("SELECT COALESCE(SUM(grand_total), 0) as total FROM invoices WHERE status = 'paid'")->fetch_assoc()['total'],
+    'pending_payments' => $conn->query("SELECT COUNT(*) as count FROM payments WHERE payment_status = 'pending'")->fetch_assoc()['count'],
+    'unread_notifications' => $conn->query("SELECT COUNT(*) as count FROM notifications WHERE is_read = 0")->fetch_assoc()['count'],
+];
+
+// Get recent appointments
+$recent_appointments = $conn->query("
+    SELECT a.*, u.full_name, s.service_name 
+    FROM appointments a
+    JOIN users u ON a.user_id = u.user_id
+    JOIN services s ON a.service_id = s.service_id
+    ORDER BY a.created_at DESC LIMIT 5
+");
+
+// Get recent payments
+$recent_payments = $conn->query("
+    SELECT p.*, u.full_name, i.invoice_number
+    FROM payments p
+    JOIN invoices i ON p.invoice_id = i.invoice_id
+    JOIN users u ON i.user_id = u.user_id
+    ORDER BY p.payment_date DESC LIMIT 5
+");
+
+// Get queue status
+$queue_status = $conn->query("
+    SELECT * FROM queue_management 
+    WHERE status IN ('waiting', 'in-service')
+    ORDER BY queue_position ASC LIMIT 5
+");
+
+// Get low inventory
+$low_inventory = $conn->query("
+    SELECT * FROM parts 
+    WHERE quantity <= 10 
+    ORDER BY quantity ASC LIMIT 5
+");
 
 ?>
 
@@ -41,15 +81,15 @@ $totalStaff = $conn->query("SELECT COUNT(*) as count FROM staff")->fetch_assoc()
             background: #f5f7fa;
         }
 
-        .admin-wrapper {
+        .admin-container {
             display: flex;
             min-height: 100vh;
         }
 
-        /* Sidebar Navigation */
+        /* Sidebar */
         .sidebar {
-            width: 220px;
-            background: linear-gradient(180deg, #0052cc 0%, #0052cc 100%);
+            width: 250px;
+            background: linear-gradient(180deg, #1a3a52 0%, #2d5a7b 100%);
             position: fixed;
             height: 100vh;
             overflow-y: auto;
@@ -58,7 +98,7 @@ $totalStaff = $conn->query("SELECT COUNT(*) as count FROM staff")->fetch_assoc()
         }
 
         .sidebar-brand {
-            padding: 20px 15px;
+            padding: 20px 20px;
             text-align: center;
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             margin-bottom: 20px;
@@ -66,7 +106,7 @@ $totalStaff = $conn->query("SELECT COUNT(*) as count FROM staff")->fetch_assoc()
 
         .sidebar-brand i {
             font-size: 32px;
-            color: #fff;
+            color: #4ECDC4;
             display: block;
             margin-bottom: 10px;
         }
@@ -75,7 +115,7 @@ $totalStaff = $conn->query("SELECT COUNT(*) as count FROM staff")->fetch_assoc()
             color: #fff;
             font-weight: 700;
             margin: 0;
-            font-size: 16px;
+            font-size: 18px;
         }
 
         .sidebar-menu {
@@ -100,8 +140,8 @@ $totalStaff = $conn->query("SELECT COUNT(*) as count FROM staff")->fetch_assoc()
         .sidebar-menu a:hover,
         .sidebar-menu a.active {
             background: rgba(255, 255, 255, 0.1);
-            color: #fff;
-            border-left-color: #ff6b6b;
+            color: #4ECDC4;
+            border-left-color: #e74c3c;
         }
 
         .sidebar-menu i {
@@ -109,58 +149,66 @@ $totalStaff = $conn->query("SELECT COUNT(*) as count FROM staff")->fetch_assoc()
             width: 20px;
         }
 
+        .sidebar-section-title {
+            padding: 20px 20px 10px;
+            font-size: 12px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.5);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
         /* Main Content */
         .main-content {
-            margin-left: 220px;
+            margin-left: 250px;
             flex: 1;
             display: flex;
             flex-direction: column;
         }
 
-        /* Header */
-        .admin-header {
-            background: #fff;
+        .top-navbar {
+            background: white;
             padding: 20px 30px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 1px solid #e0e0e0;
+            border-bottom: 2px solid #e74c3c;
         }
 
-        .header-left h2 {
+        .top-navbar h2 {
             margin: 0;
-            color: #333;
+            color: #1a3a52;
             font-weight: 700;
             font-size: 24px;
         }
 
-        .header-right {
+        .navbar-right {
             display: flex;
             align-items: center;
             gap: 20px;
         }
 
-        .header-time {
+        .navbar-time {
             font-size: 14px;
             color: #666;
             font-weight: 500;
         }
 
-        .header-user {
+        .navbar-user {
             display: flex;
             align-items: center;
             gap: 10px;
             padding: 8px 15px;
-            background: #f0f0f0;
+            background: #f8f9fa;
             border-radius: 20px;
             cursor: pointer;
         }
 
-        .header-user i {
+        .navbar-user i {
             width: 30px;
             height: 30px;
-            background: #0052cc;
+            background: #1a3a52;
             color: white;
             border-radius: 50%;
             display: flex;
@@ -169,139 +217,136 @@ $totalStaff = $conn->query("SELECT COUNT(*) as count FROM staff")->fetch_assoc()
             font-size: 14px;
         }
 
-        /* Content Area */
         .content-area {
             flex: 1;
             padding: 30px;
             overflow-y: auto;
         }
 
-        /* Top Metrics Row */
-        .metrics-row {
+        /* Stats Cards */
+        .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 20px;
             margin-bottom: 30px;
         }
 
-        .metric-card {
-            background: #fff;
-            padding: 20px;
+        .stat-card {
+            background: white;
+            padding: 25px;
             border-radius: 10px;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-            border: 1px solid #e0e0e0;
+            border-top: 4px solid #e74c3c;
+            transition: all 0.3s ease;
         }
 
-        .metric-card.red {
-            border-top: 4px solid #ff6b6b;
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
         }
 
-        .metric-card.blue {
-            border-top: 4px solid #0052cc;
-        }
-
-        .metric-label {
+        .stat-label {
             font-size: 12px;
-            color: #666;
+            color: #999;
             font-weight: 500;
             margin-bottom: 8px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
 
-        .metric-value {
-            font-size: 28px;
+        .stat-value {
+            font-size: 32px;
             font-weight: 700;
-            color: #333;
+            color: #1a3a52;
+            margin-bottom: 5px;
         }
 
-        .metric-change {
+        .stat-change {
             font-size: 12px;
-            color: #27ae60;
-            margin-top: 8px;
+            color: #28a745;
         }
 
-        /* Two Column Layout for Charts and Tables */
+        /* Dashboard Grid */
         .dashboard-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: 2fr 1fr;
             gap: 20px;
             margin-bottom: 30px;
         }
 
-        .dashboard-grid.full {
-            grid-template-columns: 1fr;
+        @media (max-width: 1200px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
         }
 
-        /* Card Styles */
-        .dashboard-card {
-            background: #fff;
+        /* Module Cards */
+        .module-card {
+            background: white;
             border-radius: 10px;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-            border: 1px solid #e0e0e0;
-            padding: 20px;
-        }
-
-        .card-header {
+            padding: 25px;
+            text-decoration: none;
+            color: inherit;
+            transition: all 0.3s ease;
+            border-left: 4px solid #e74c3c;
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            padding-bottom: 15px;
-            border-bottom: 1px solid #e0e0e0;
+            flex-direction: column;
+            gap: 12px;
         }
 
-        .card-header h3 {
-            margin: 0;
-            color: #333;
+        .module-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .module-icon {
+            font-size: 32px;
+            color: #2d5a7b;
+        }
+
+        .module-title {
             font-weight: 700;
             font-size: 16px;
+            color: #1a3a52;
         }
 
-        .card-header .btn-link {
-            color: #0052cc;
-            text-decoration: none;
-            font-size: 12px;
-            font-weight: 600;
+        .module-description {
+            font-size: 13px;
+            color: #999;
+            margin: 0;
         }
 
-        /* Chart Container */
-        .chart-container {
-            position: relative;
-            height: 300px;
-            margin-bottom: 20px;
-        }
-
-        /* Table Styles */
-        .dashboard-table {
+        /* Tables */
+        .data-table {
             width: 100%;
             border-collapse: collapse;
+            margin-top: 15px;
         }
 
-        .dashboard-table thead th {
-            background: #f5f7fa;
-            padding: 12px;
+        .data-table thead th {
+            background: #f8f9fa;
+            padding: 12px 15px;
             font-size: 12px;
             font-weight: 600;
-            color: #666;
+            color: #1a3a52;
             text-align: left;
             border-bottom: 2px solid #e0e0e0;
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
 
-        .dashboard-table tbody td {
-            padding: 14px 12px;
-            border-bottom: 1px solid #e0e0e0;
+        .data-table tbody td {
+            padding: 14px 15px;
+            border-bottom: 1px solid #f0f0f0;
             font-size: 13px;
-            color: #333;
+            color: #666;
         }
 
-        .dashboard-table tbody tr:hover {
-            background: #f9f9f9;
+        .data-table tbody tr:hover {
+            background: #f8f9fa;
         }
 
-        /* Status Badge */
         .badge-success {
             background: #d4edda;
             color: #155724;
@@ -329,174 +374,440 @@ $totalStaff = $conn->query("SELECT COUNT(*) as count FROM staff")->fetch_assoc()
             font-weight: 600;
         }
 
-        /* Responsive */
-        @media (max-width: 768px) {
-            .sidebar {
-                width: 0;
-                position: absolute;
-            }
+        .badge-info {
+            background: #d1ecf1;
+            color: #0c5460;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+        }
 
-            .main-content {
-                margin-left: 0;
-            }
+        .section-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1a3a52;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
 
-            .dashboard-grid {
-                grid-template-columns: 1fr;
-            }
+        .section-title i {
+            color: #e74c3c;
+        }
 
-            .metrics-row {
-                grid-template-columns: repeat(2, 1fr);
-            }
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 12px;
+            margin-bottom: 30px;
+        }
 
-            .admin-header {
-                flex-direction: column;
-                gap: 15px;
-            }
+        .quick-action-btn {
+            background: linear-gradient(135deg, #2d5a7b 0%, #1a3a52 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-decoration: none;
+            text-align: center;
+            font-weight: 600;
+            font-size: 13px;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .quick-action-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 15px rgba(45, 90, 123, 0.3);
+            color: white;
+            text-decoration: none;
+        }
+
+        .quick-action-btn i {
+            font-size: 20px;
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #e74c3c;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #c0392b;
         }
     </style>
 </head>
 <body>
-    <div class="admin-wrapper">
-        <!-- Sidebar -->
+    <div class="admin-container">
+        <!-- Sidebar Navigation -->
         <aside class="sidebar">
             <div class="sidebar-brand">
                 <i class="fas fa-car"></i>
                 <h5>VehiCare</h5>
             </div>
+
+            <div class="sidebar-section-title">Main</div>
             <ul class="sidebar-menu">
                 <li><a href="/vehicare_db/admins/dashboard.php" class="active"><i class="fas fa-chart-line"></i> Dashboard</a></li>
-                <li><a href="/vehicare_db/admins/users.php"><i class="fas fa-users"></i> Users</a></li>
-                <li><a href="/vehicare_db/admins/clients.php"><i class="fas fa-user-tie"></i> Clients</a></li>
-                <li><a href="/vehicare_db/admins/vehicles.php"><i class="fas fa-car"></i> Vehicles</a></li>
-                <li><a href="/vehicare_db/admins/appointments.php"><i class="fas fa-calendar"></i> Appointments</a></li>
+            </ul>
+
+            <div class="sidebar-section-title">Services & Bookings</div>
+            <ul class="sidebar-menu">
                 <li><a href="/vehicare_db/admins/services.php"><i class="fas fa-cogs"></i> Services</a></li>
-                <li><a href="/vehicare_db/admins/staff.php"><i class="fas fa-people-group"></i> Staff</a></li>
-                <li><a href="/vehicare_db/admins/parts.php"><i class="fas fa-box"></i> Parts</a></li>
-                <li><a href="/vehicare_db/admins/payments.php"><i class="fas fa-money-bill"></i> Payments</a></li>
+                <li><a href="/vehicare_db/admins/appointments.php"><i class="fas fa-calendar"></i> Appointments</a></li>
+                <li><a href="/vehicare_db/admins/manage_appointments.php"><i class="fas fa-tasks"></i> Manage Bookings</a></li>
+            </ul>
+
+            <div class="sidebar-section-title">Operations</div>
+            <ul class="sidebar-menu">
+                <li><a href="/vehicare_db/admins/queue_management.php"><i class="fas fa-hourglass-start"></i> Queue Management</a></li>
+                <li><a href="/vehicare_db/admins/queue_notifications.php"><i class="fas fa-bell"></i> Notifications</a></li>
+                <li><a href="/vehicare_db/admins/staff.php"><i class="fas fa-people-group"></i> Staff/Technicians</a></li>
+            </ul>
+
+            <div class="sidebar-section-title">Management</div>
+            <ul class="sidebar-menu">
+                <li><a href="/vehicare_db/admins/customers.php"><i class="fas fa-users"></i> Clients</a></li>
+                <li><a href="/vehicare_db/admins/vehicles.php"><i class="fas fa-car"></i> Vehicles</a></li>
+                <li><a href="/vehicare_db/admins/parts.php"><i class="fas fa-box"></i> Inventory</a></li>
+            </ul>
+
+            <div class="sidebar-section-title">Financial</div>
+            <ul class="sidebar-menu">
+                <li><a href="/vehicare_db/admins/payments.php"><i class="fas fa-credit-card"></i> Payments</a></li>
+                <li><a href="/vehicare_db/admins/billing_invoices.php"><i class="fas fa-file-invoice"></i> Invoices</a></li>
+                <li><a href="/vehicare_db/admins/payment_management.php"><i class="fas fa-money-bill"></i> Payment Mgmt</a></li>
+            </ul>
+
+            <div class="sidebar-section-title">Reports & Analytics</div>
+            <ul class="sidebar-menu">
+                <li><a href="/vehicare_db/admins/staff_ratings_reports.php"><i class="fas fa-star"></i> Staff Ratings</a></li>
+                <li><a href="/vehicare_db/admins/audit_logs.php"><i class="fas fa-history"></i> Audit Logs</a></li>
+            </ul>
+
+            <div class="sidebar-section-title">Account</div>
+            <ul class="sidebar-menu">
                 <li><a href="/vehicare_db/logout.php"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
             </ul>
         </aside>
 
         <!-- Main Content -->
         <div class="main-content">
-            <!-- Header -->
-            <header class="admin-header">
-                <div class="header-left">
-                    <h2>Dashboard</h2>
-                </div>
-                <div class="header-right">
-                    <span class="header-time" id="current-time">09:55</span>
-                    <div class="header-user">
-                        <i class="fas fa-bell"></i>
+            <!-- Top Navbar -->
+            <div class="top-navbar">
+                <h2>Dashboard</h2>
+                <div class="navbar-right">
+                    <span class="navbar-time" id="current-time">09:55</span>
+                    <div class="navbar-user">
                         <i class="fas fa-user"></i>
+                        <span><?php echo htmlspecialchars($_SESSION['username'] ?? 'Admin'); ?></span>
                     </div>
                 </div>
-            </header>
+            </div>
 
-            <!-- Content -->
+            <!-- Content Area -->
             <div class="content-area">
-                <!-- Key Metrics -->
-                <div class="metrics-row">
-                    <div class="metric-card red">
-                        <div class="metric-label">Total Revenue</div>
-                        <div class="metric-value">$<?php echo $totalRevenue; ?></div>
-                        <div class="metric-change">↑ 12.5% from last month</div>
+                <!-- Quick Actions -->
+                <div class="quick-actions">
+                    <a href="/vehicare_db/admins/manage_appointments.php?action=new" class="quick-action-btn">
+                        <i class="fas fa-plus"></i>
+                        New Booking
+                    </a>
+                    <a href="/vehicare_db/admins/queue_management.php" class="quick-action-btn">
+                        <i class="fas fa-hourglass-start"></i>
+                        Queue
+                    </a>
+                    <a href="/vehicare_db/admins/payments.php" class="quick-action-btn">
+                        <i class="fas fa-credit-card"></i>
+                        Payments
+                    </a>
+                    <a href="/vehicare_db/admins/parts.php" class="quick-action-btn">
+                        <i class="fas fa-box"></i>
+                        Inventory
+                    </a>
+                    <a href="/vehicare_db/admins/customers.php" class="quick-action-btn">
+                        <i class="fas fa-users"></i>
+                        Clients
+                    </a>
+                    <a href="/vehicare_db/admins/staff.php" class="quick-action-btn">
+                        <i class="fas fa-people-group"></i>
+                        Staff
+                    </a>
+                </div>
+
+                <!-- Statistics Cards -->
+                <div class="stats-grid">
+                    <div class="stat-card" style="border-top-color: #1a3a52;">
+                        <div class="stat-label">Total Clients</div>
+                        <div class="stat-value"><?php echo $stats['total_clients']; ?></div>
+                        <div class="stat-change"><i class="fas fa-arrow-up"></i> Active Users</div>
                     </div>
-                    <div class="metric-card blue">
-                        <div class="metric-label">Total Clients</div>
-                        <div class="metric-value"><?php echo $clientCount; ?></div>
-                        <div class="metric-change">↑ 8 new this month</div>
+                    <div class="stat-card" style="border-top-color: #2d5a7b;">
+                        <div class="stat-label">Appointments</div>
+                        <div class="stat-value"><?php echo $stats['pending_appointments']; ?></div>
+                        <div class="stat-change"><?php echo $stats['pending_appointments']; ?> Pending</div>
                     </div>
-                    <div class="metric-card red">
-                        <div class="metric-label">Pending Appointments</div>
-                        <div class="metric-value"><?php echo $appointmentCount; ?></div>
-                        <div class="metric-change">Need attention</div>
+                    <div class="stat-card" style="border-top-color: #e74c3c;">
+                        <div class="stat-label">Queue Waiting</div>
+                        <div class="stat-value"><?php echo $stats['queue_pending']; ?></div>
+                        <div class="stat-change">In Queue</div>
                     </div>
-                    <div class="metric-card blue">
-                        <div class="metric-label">Total Vehicles</div>
-                        <div class="metric-value"><?php echo $vehicleCount; ?></div>
-                        <div class="metric-change">↑ 3 new vehicles</div>
+                    <div class="stat-card" style="border-top-color: #4ECDC4;">
+                        <div class="stat-label">Total Revenue</div>
+                        <div class="stat-value">₱<?php echo number_format($stats['total_revenue'], 0); ?></div>
+                        <div class="stat-change">From Paid Invoices</div>
+                    </div>
+                    <div class="stat-card" style="border-top-color: #28a745;">
+                        <div class="stat-label">Total Staff</div>
+                        <div class="stat-value"><?php echo $stats['total_staff']; ?></div>
+                        <div class="stat-change">Active Technicians</div>
+                    </div>
+                    <div class="stat-card" style="border-top-color: #ffc107;">
+                        <div class="stat-label">Unpaid Invoices</div>
+                        <div class="stat-value"><?php echo $stats['unpaid_invoices']; ?></div>
+                        <div class="stat-change">Pending Payment</div>
+                    </div>
+                    <div class="stat-card" style="border-top-color: #dc3545;">
+                        <div class="stat-label">Low Inventory</div>
+                        <div class="stat-value"><?php echo $stats['total_parts']; ?></div>
+                        <div class="stat-change">Total Parts</div>
+                    </div>
+                    <div class="stat-card" style="border-top-color: #17a2b8;">
+                        <div class="stat-label">Notifications</div>
+                        <div class="stat-value"><?php echo $stats['unread_notifications']; ?></div>
+                        <div class="stat-change">Unread</div>
                     </div>
                 </div>
 
-                <!-- Charts and Tables -->
+                <!-- Main Dashboard Grid -->
                 <div class="dashboard-grid">
-                    <!-- Revenue Chart -->
-                    <div class="dashboard-card">
-                        <div class="card-header">
-                            <h3>Revenue Trend</h3>
-                            <a href="#" class="card-header-link">View Report</a>
+                    <!-- Left Column -->
+                    <div>
+                        <!-- Recent Appointments -->
+                        <div style="background: white; border-radius: 10px; padding: 25px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+                            <div class="section-title">
+                                <i class="fas fa-calendar-check"></i>
+                                Recent Appointments
+                            </div>
+                            <?php if ($recent_appointments && $recent_appointments->num_rows > 0): ?>
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Client</th>
+                                        <th>Service</th>
+                                        <th>Status</th>
+                                        <th>Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php while ($apt = $recent_appointments->fetch_assoc()): ?>
+                                    <tr>
+                                        <td><?php echo htmlspecialchars($apt['full_name']); ?></td>
+                                        <td><?php echo htmlspecialchars($apt['service_name']); ?></td>
+                                        <td>
+                                            <span class="badge-<?php echo $apt['status'] == 'completed' ? 'success' : 'info'; ?>">
+                                                <?php echo ucfirst($apt['status']); ?>
+                                            </span>
+                                        </td>
+                                        <td><?php echo date('M d, Y', strtotime($apt['appointment_date'])); ?></td>
+                                    </tr>
+                                    <?php endwhile; ?>
+                                </tbody>
+                            </table>
+                            <?php else: ?>
+                            <p style="text-align: center; color: #999; padding: 20px;">No recent appointments</p>
+                            <?php endif; ?>
                         </div>
-                        <div class="chart-container">
-                            <canvas id="revenueChart"></canvas>
+
+                        <!-- Queue Status -->
+                        <div style="background: white; border-radius: 10px; padding: 25px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+                            <div class="section-title">
+                                <i class="fas fa-hourglass-start"></i>
+                                Queue Status
+                            </div>
+                            <?php if ($queue_status && $queue_status->num_rows > 0): ?>
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Queue #</th>
+                                        <th>Customer</th>
+                                        <th>Service</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php while ($queue = $queue_status->fetch_assoc()): ?>
+                                    <tr>
+                                        <td><strong><?php echo $queue['queue_position']; ?></strong></td>
+                                        <td><?php echo htmlspecialchars($queue['customer_name']); ?></td>
+                                        <td><?php echo htmlspecialchars($queue['service_name'] ?? 'N/A'); ?></td>
+                                        <td>
+                                            <span class="badge-<?php echo $queue['status'] == 'in-service' ? 'success' : 'warning'; ?>">
+                                                <?php echo ucfirst(str_replace('-', ' ', $queue['status'])); ?>
+                                            </span>
+                                        </td>
+                                    </tr>
+                                    <?php endwhile; ?>
+                                </tbody>
+                            </table>
+                            <?php else: ?>
+                            <p style="text-align: center; color: #999; padding: 20px;">No items in queue</p>
+                            <?php endif; ?>
                         </div>
                     </div>
 
-                    <!-- Efficiency Chart -->
-                    <div class="dashboard-card">
-                        <div class="card-header">
-                            <h3>Service Efficiency</h3>
-                            <a href="#" class="card-header-link">Details</a>
+                    <!-- Right Column -->
+                    <div>
+                        <!-- Recent Payments -->
+                        <div style="background: white; border-radius: 10px; padding: 25px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+                            <div class="section-title">
+                                <i class="fas fa-credit-card"></i>
+                                Recent Payments
+                            </div>
+                            <?php if ($recent_payments && $recent_payments->num_rows > 0): ?>
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Client</th>
+                                        <th>Amount</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php while ($payment = $recent_payments->fetch_assoc()): ?>
+                                    <tr>
+                                        <td><?php echo htmlspecialchars($payment['full_name']); ?></td>
+                                        <td>₱<?php echo number_format($payment['amount'], 2); ?></td>
+                                        <td>
+                                            <span class="badge-<?php echo $payment['payment_status'] == 'completed' ? 'success' : 'warning'; ?>">
+                                                <?php echo ucfirst($payment['payment_status']); ?>
+                                            </span>
+                                        </td>
+                                    </tr>
+                                    <?php endwhile; ?>
+                                </tbody>
+                            </table>
+                            <?php else: ?>
+                            <p style="text-align: center; color: #999; padding: 20px;">No recent payments</p>
+                            <?php endif; ?>
                         </div>
-                        <div class="chart-container">
-                            <canvas id="efficiencyChart"></canvas>
+
+                        <!-- Low Inventory -->
+                        <div style="background: white; border-radius: 10px; padding: 25px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+                            <div class="section-title">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                Low Inventory Alert
+                            </div>
+                            <?php if ($low_inventory && $low_inventory->num_rows > 0): ?>
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Part</th>
+                                        <th>Qty</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php while ($part = $low_inventory->fetch_assoc()): ?>
+                                    <tr>
+                                        <td><?php echo htmlspecialchars($part['part_name']); ?></td>
+                                        <td>
+                                            <span class="badge-danger">
+                                                <?php echo $part['quantity']; ?>
+                                            </span>
+                                        </td>
+                                    </tr>
+                                    <?php endwhile; ?>
+                                </tbody>
+                            </table>
+                            <?php else: ?>
+                            <p style="text-align: center; color: #999; padding: 20px;">All inventory levels good</p>
+                            <?php endif; ?>
                         </div>
                     </div>
                 </div>
 
-                <!-- Recent Appointments -->
-                <div class="dashboard-card">
-                    <div class="card-header">
-                        <h3>Recent Appointments</h3>
-                        <a href="/vehicare_db/admins/appointments.php" class="card-header-link">View All</a>
-                    </div>
-                    <table class="dashboard-table">
-                        <thead>
-                            <tr>
-                                <th>Client</th>
-                                <th>Service</th>
-                                <th>Date</th>
-                                <th>Time</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php
-                            $appointments = $conn->query("
-                                SELECT a.*, c.full_name, s.service_name 
-                                FROM appointments a
-                                JOIN clients c ON a.client_id = c.client_id
-                                JOIN services s ON a.service_id = s.service_id
-                                ORDER BY a.appointment_date DESC LIMIT 5
-                            ");
-                            
-                            if ($appointments && $appointments->num_rows > 0) {
-                                while ($apt = $appointments->fetch_assoc()) {
-                                    $status_class = strtolower($apt['status']);
-                                    echo "
-                                    <tr>
-                                        <td>" . htmlspecialchars($apt['full_name']) . "</td>
-                                        <td>" . htmlspecialchars($apt['service_name']) . "</td>
-                                        <td>" . date('M d, Y', strtotime($apt['appointment_date'])) . "</td>
-                                        <td>" . date('h:i A', strtotime($apt['appointment_time'])) . "</td>
-                                        <td><span class='badge-" . ($apt['status'] == 'Completed' ? 'success' : ($apt['status'] == 'Pending' ? 'warning' : 'danger')) . "'>" . ucfirst($apt['status']) . "</span></td>
-                                    </tr>
-                                    ";
-                                }
-                            } else {
-                                echo "<tr><td colspan='5' style='text-align: center; color: #999;'>No appointments found</td></tr>";
-                            }
-                            ?>
-                        </tbody>
-                    </table>
+                <!-- System Modules Grid -->
+                <h3 style="margin-top: 40px; margin-bottom: 20px; color: #1a3a52; font-weight: 700;">System Modules</h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-bottom: 30px;">
+                    <a href="/vehicare_db/admins/services.php" class="module-card">
+                        <div class="module-icon"><i class="fas fa-cogs"></i></div>
+                        <div class="module-title">Services</div>
+                        <p class="module-description">Manage service catalog</p>
+                    </a>
+                    <a href="/vehicare_db/admins/customers.php" class="module-card">
+                        <div class="module-icon"><i class="fas fa-users"></i></div>
+                        <div class="module-title">Clients</div>
+                        <p class="module-description">Client management system</p>
+                    </a>
+                    <a href="/vehicare_db/admins/staff.php" class="module-card">
+                        <div class="module-icon"><i class="fas fa-people-group"></i></div>
+                        <div class="module-title">Technicians</div>
+                        <p class="module-description">Assign & manage staff</p>
+                    </a>
+                    <a href="/vehicare_db/admins/vehicles.php" class="module-card">
+                        <div class="module-icon"><i class="fas fa-car"></i></div>
+                        <div class="module-title">Vehicles</div>
+                        <p class="module-description">Client vehicle database</p>
+                    </a>
+                    <a href="/vehicare_db/admins/manage_appointments.php" class="module-card">
+                        <div class="module-icon"><i class="fas fa-calendar-check"></i></div>
+                        <div class="module-title">Bookings</div>
+                        <p class="module-description">Appointment & walk-in system</p>
+                    </a>
+                    <a href="/vehicare_db/admins/queue_management.php" class="module-card">
+                        <div class="module-icon"><i class="fas fa-hourglass-start"></i></div>
+                        <div class="module-title">Queue</div>
+                        <p class="module-description">Queue management</p>
+                    </a>
+                    <a href="/vehicare_db/admins/parts.php" class="module-card">
+                        <div class="module-icon"><i class="fas fa-box"></i></div>
+                        <div class="module-title">Inventory</div>
+                        <p class="module-description">Parts & inventory CRUD</p>
+                    </a>
+                    <a href="/vehicare_db/admins/payments.php" class="module-card">
+                        <div class="module-icon"><i class="fas fa-credit-card"></i></div>
+                        <div class="module-title">Payments</div>
+                        <p class="module-description">Payment management</p>
+                    </a>
+                    <a href="/vehicare_db/admins/billing_invoices.php" class="module-card">
+                        <div class="module-icon"><i class="fas fa-file-invoice"></i></div>
+                        <div class="module-title">Invoices</div>
+                        <p class="module-description">Billing system</p>
+                    </a>
+                    <a href="/vehicare_db/admins/staff_ratings_reports.php" class="module-card">
+                        <div class="module-icon"><i class="fas fa-star"></i></div>
+                        <div class="module-title">Ratings</div>
+                        <p class="module-description">Staff ratings & reports</p>
+                    </a>
+                    <a href="/vehicare_db/admins/queue_notifications.php" class="module-card">
+                        <div class="module-icon"><i class="fas fa-bell"></i></div>
+                        <div class="module-title">Notifications</div>
+                        <p class="module-description">Notification system</p>
+                    </a>
+                    <a href="/vehicare_db/admins/audit_logs.php" class="module-card">
+                        <div class="module-icon"><i class="fas fa-history"></i></div>
+                        <div class="module-title">Audit Logs</div>
+                        <p class="module-description">System audit trail</p>
+                    </a>
                 </div>
             </div>
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // Update time
+        // Update current time
         function updateTime() {
             const now = new Date();
             const hours = String(now.getHours()).padStart(2, '0');
@@ -505,179 +816,6 @@ $totalStaff = $conn->query("SELECT COUNT(*) as count FROM staff")->fetch_assoc()
         }
         updateTime();
         setInterval(updateTime, 60000);
-
-        // Revenue Chart
-        const revenueCtx = document.getElementById('revenueChart');
-        if (revenueCtx) {
-            new Chart(revenueCtx, {
-                type: 'line',
-                data: {
-                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-                    datasets: [{
-                        label: 'Revenue',
-                        data: [65000, 75000, 72000, 85000, 95000, 88000],
-                        borderColor: '#0052cc',
-                        backgroundColor: 'rgba(0, 82, 204, 0.05)',
-                        borderWidth: 2,
-                        tension: 0.4,
-                        fill: true,
-                        pointRadius: 5,
-                        pointBackgroundColor: '#0052cc'
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            display: false
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            grid: {
-                                color: 'rgba(0, 0, 0, 0.05)'
-                            }
-                        },
-                        x: {
-                            grid: {
-                                display: false
-                            }
-                        }
-                    }
-                }
-            });
-        }
-
-        // Efficiency Chart
-        const efficiencyCtx = document.getElementById('efficiencyChart');
-        if (efficiencyCtx) {
-            new Chart(efficiencyCtx, {
-                type: 'doughnut',
-                data: {
-                    labels: ['Completed', 'Pending', 'Cancelled'],
-                    datasets: [{
-                        data: [65, 25, 10],
-                        backgroundColor: ['#27ae60', '#ff6b6b', '#f39c12']
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            position: 'bottom'
-                        }
-                    }
-                }
-            });
-        }
     </script>
 </body>
 </html>
-    </div>
-    <div style="overflow-x: auto;">
-      <table class="table">
-        <thead>
-          <tr>
-            <th>Appointment ID</th>
-            <th>Client Name</th>
-            <th>Vehicle</th>
-            <th>Service</th>
-            <th>Date</th>
-            <th>Time</th>
-            <th>Status</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          <?php
-          $appointmentsQuery = $conn->query("
-            SELECT a.*, c.full_name, v.plate_number, v.car_brand, v.car_model, s.service_name
-            FROM appointments a
-            LEFT JOIN clients c ON a.client_id = c.client_id
-            LEFT JOIN vehicles v ON a.vehicle_id = v.vehicle_id
-            LEFT JOIN services s ON a.service_id = s.service_id
-            ORDER BY a.appointment_date DESC
-            LIMIT 5
-          ");
-          
-          if ($appointmentsQuery) {
-            while ($apt = $appointmentsQuery->fetch_assoc()) {
-              $statusBadge = 'badge-primary';
-              if ($apt['status'] == 'Completed') $statusBadge = 'badge-success';
-              if ($apt['status'] == 'Cancelled') $statusBadge = 'badge-danger';
-              
-              echo "<tr>
-                <td>#{$apt['appointment_id']}</td>
-                <td>{$apt['full_name']}</td>
-                <td>{$apt['car_brand']} {$apt['car_model']}</td>
-                <td>{$apt['service_name']}</td>
-                <td>" . date('M d, Y', strtotime($apt['appointment_date'])) . "</td>
-                <td>" . date('h:i A', strtotime($apt['appointment_time'])) . "</td>
-                <td><span class='badge {$statusBadge}'>{$apt['status']}</span></td>
-                <td>
-                  <div class='action-buttons'>
-                    <a href='/vehicare_db/admins/appointments.php?edit={$apt['appointment_id']}' class='btn btn-primary btn-sm'>Edit</a>
-                    <a href='/vehicare_db/admins/delete.php?type=appointment&id={$apt['appointment_id']}' class='btn btn-danger btn-sm' onclick='return confirm(\"Are you sure?\")'>Delete</a>
-                  </div>
-                </td>
-              </tr>";
-            }
-          }
-          ?>
-        </tbody>
-      </table>
-    </div>
-  </div>
-
-  <!-- Recent Invoices -->
-  <div class="table-container">
-    <div class="table-header">
-      <h3>Recent Invoices</h3>
-      <a href="/vehicare_db/admins/payments.php" class="btn btn-primary btn-sm">View All</a>
-    </div>
-    <div style="overflow-x: auto;">
-      <table class="table">
-        <thead>
-          <tr>
-            <th>Invoice ID</th>
-            <th>Appointment</th>
-            <th>Labor Cost</th>
-            <th>Parts Cost</th>
-            <th>Total</th>
-            <th>Date</th>
-          </tr>
-        </thead>
-        <tbody>
-          <?php
-          $invoicesQuery = $conn->query("
-            SELECT i.*, a.appointment_id
-            FROM invoices i
-            LEFT JOIN appointments a ON i.appointment_id = a.appointment_id
-            ORDER BY i.invoice_date DESC
-            LIMIT 5
-          ");
-          
-          if ($invoicesQuery) {
-            while ($inv = $invoicesQuery->fetch_assoc()) {
-              echo "<tr>
-                <td>#{$inv['invoice_id']}</td>
-                <td>#{$inv['appointment_id']}</td>
-                <td>\${$inv['total_labor']}</td>
-                <td>\${$inv['total_parts']}</td>
-                <td><strong>\${$inv['grand_total']}</strong></td>
-                <td>" . date('M d, Y', strtotime($inv['invoice_date'])) . "</td>
-              </tr>";
-            }
-          }
-          ?>
-        </tbody>
-      </table>
-    </div>
-  </div>
-
-</div>
-
-<?php include __DIR__ . '/../includes/footer.php'; ?>

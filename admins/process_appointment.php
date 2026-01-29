@@ -1,9 +1,9 @@
-<?php
+﻿<?php
 session_start();
 require_once __DIR__ . '/../includes/config.php';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    // Handle appointment form submission from homepage
+    
     $full_name = $conn->real_escape_string($_POST['full_name']);
     $phone = $conn->real_escape_string($_POST['phone']);
     $email = $conn->real_escape_string($_POST['email']);
@@ -13,17 +13,17 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $appointment_time = $conn->real_escape_string($_POST['appointment_time']);
     $notes = isset($_POST['notes']) ? $conn->real_escape_string($_POST['notes']) : '';
     
-    // Check if client exists
+    
     $clientCheck = $conn->query("SELECT client_id FROM clients WHERE email = '$email' LIMIT 1");
     
     if ($clientCheck && $clientCheck->num_rows > 0) {
         $client = $clientCheck->fetch_assoc();
         $client_id = $client['client_id'];
         
-        // Update client info if needed
+        
         $conn->query("UPDATE clients SET full_name='$full_name', phone='$phone' WHERE client_id = $client_id");
     } else {
-        // Create new client
+        
         $insertClient = $conn->query("INSERT INTO clients (full_name, phone, email) VALUES ('$full_name', '$phone', '$email')");
         if (!$insertClient) {
             $_SESSION['error'] = "Error creating client account";
@@ -33,7 +33,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $client_id = $conn->insert_id;
     }
     
-    // Create appointment
+    
     $insertAppointment = $conn->query("INSERT INTO appointments (client_id, service_id, appointment_date, appointment_time, status) 
                                       VALUES ($client_id, $service_id, '$appointment_date', '$appointment_time', 'Pending')");
     
@@ -43,7 +43,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $_SESSION['error'] = "Error booking appointment: " . $conn->error;
     }
     
-    header("Location: /vehicare_db/index.php#appointment");
+    header("Location: /vehicare_db/index.php");
     exit;
 }
 ?>
+

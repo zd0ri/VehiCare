@@ -15,13 +15,13 @@ include __DIR__ . '/includes/header.php';
       <h1>Your Vehicle <span class="highlight-text">Deserves</span> Expert Care</h1>
       <p>Professional vehicle maintenance and repair services. Trust VehiCare with your automotive needs.</p>
       <div class="hero-cta">
-        <a href="#services" class="btn btn-dark btn-lg">Explore Services</a>
-        <a href="#appointment" class="btn btn-outline-primary btn-lg">Book Now</a>
+        <a href="#services" class="btn btn-primary btn-lg">Explore Services</a>
+        <a href="#appointment" class="btn btn-outline-light btn-lg">Book Now</a>
       </div>
     </div>
     <div class="hero-media">
-      <div style="background: linear-gradient(135deg, rgba(45, 90, 123, 0.2) 0%, rgba(232, 245, 255, 0.2) 100%); padding: 40px; border-radius: 10px; text-align: center;">
-        <i class="fas fa-car" style="font-size: 150px; color: rgba(255, 255, 255, 0.5);"></i>
+      <div style="background: linear-gradient(135deg, rgba(45, 90, 123, 0.1) 0%, rgba(78, 205, 196, 0.1) 100%); padding: 40px; border-radius: 10px; text-align: center;">
+        <i class="fas fa-car" style="font-size: 150px; color: #4ECDC4;"></i>
       </div>
     </div>
   </div>
@@ -32,32 +32,32 @@ include __DIR__ . '/includes/header.php';
   <div class="container">
     <h2 class="section-title">Our Services</h2>
     <div class="services-grid">
-      <div class="service-card">
+      <div class="service-card" style="background: linear-gradient(135deg, #E8F4F8 0%, #D4E8F0 100%); color: #1a3a52;">
         <i class="fas fa-cogs"></i>
         <h3>Regular Maintenance</h3>
         <p>Keep your vehicle running smoothly with our comprehensive maintenance services including oil changes, filter replacements, and inspections.</p>
       </div>
-      <div class="service-card">
+      <div class="service-card" style="background: linear-gradient(135deg, #D4E8F0 0%, #B8D8E8 100%); color: #1a3a52;">
         <i class="fas fa-tools"></i>
         <h3>Engine Repair</h3>
         <p>Expert engine diagnostics and repair services. We handle everything from minor tune-ups to major engine overhauls.</p>
       </div>
-      <div class="service-card">
+      <div class="service-card" style="background: linear-gradient(135deg, #E8F4F8 0%, #D4E8F0 100%); color: #1a3a52;">
         <i class="fas fa-brake"></i>
         <h3>Brake Service</h3>
         <p>Safety is our priority. Professional brake inspection, repair, and replacement to ensure your vehicle stops safely.</p>
       </div>
-      <div class="service-card">
+      <div class="service-card" style="background: linear-gradient(135deg, #D4E8F0 0%, #B8D8E8 100%); color: #1a3a52;">
         <i class="fas fa-oil-can"></i>
         <h3>Fluid Services</h3>
         <p>Complete fluid management including oil changes, coolant flushes, transmission fluid, and brake fluid services.</p>
       </div>
-      <div class="service-card">
+      <div class="service-card" style="background: linear-gradient(135deg, #E8F4F8 0%, #D4E8F0 100%); color: #1a3a52;">
         <i class="fas fa-car"></i>
         <h3>Tire Services</h3>
         <p>Professional tire sales, installation, balancing, and rotation. Keep your tires in perfect condition.</p>
       </div>
-      <div class="service-card">
+      <div class="service-card" style="background: linear-gradient(135deg, #D4E8F0 0%, #B8D8E8 100%); color: #1a3a52;">
         <i class="fas fa-battery-half"></i>
         <h3>Battery & Electrical</h3>
         <p>Battery testing, replacement, and electrical system diagnostics. We ensure your vehicle starts every time.</p>
@@ -152,7 +152,7 @@ include __DIR__ . '/includes/header.php';
         <label for="notes">Additional Notes</label>
         <textarea id="notes" name="notes" placeholder="Tell us about your vehicle's issues or special requests..."></textarea>
       </div>
-      <button type="submit" class="btn btn-dark btn-lg" style="width: 100%; margin-top: 10px;">Book Appointment</button>
+      <button type="submit" class="btn btn-primary btn-lg" style="width: 100%; margin-top: 10px;">Book Appointment</button>
     </form>
   </div>
 </section>

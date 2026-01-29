@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 require_once __DIR__ . '/../includes/config.php';
 
@@ -9,7 +9,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
 
 include __DIR__ . '/../includes/adminHeader.php';
 
-// Fetch parts/inventory
+
 $partsQuery = $conn->query("SELECT * FROM parts ORDER BY part_id DESC");
 ?>
 
@@ -31,7 +31,7 @@ $partsQuery = $conn->query("SELECT * FROM parts ORDER BY part_id DESC");
 </div>
 
 <div class="admin-main-content">
-  <h1 style="color: #1a3a52; margin-bottom: 20px;">Parts & Inventory</h1>
+  <h1 style="color: 
   
   <div class="table-container">
     <div class="table-header">
@@ -55,7 +55,7 @@ $partsQuery = $conn->query("SELECT * FROM parts ORDER BY part_id DESC");
           if ($partsQuery && $partsQuery->num_rows > 0) {
             while ($part = $partsQuery->fetch_assoc()) {
               echo "<tr>
-                <td>#{$part['part_id']}</td>
+                <td>
                 <td>{$part['part_name']}</td>
                 <td>{$part['brand']}</td>
                 <td>\${$part['price']}</td>
@@ -80,3 +80,4 @@ $partsQuery = $conn->query("SELECT * FROM parts ORDER BY part_id DESC");
 </div>
 
 <?php include __DIR__ . '/../includes/footer.php'; ?>
+

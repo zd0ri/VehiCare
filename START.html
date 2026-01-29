@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VehiCare System - Setup & Start</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .container-main {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+            max-width: 900px;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px 20px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            margin: 0;
+            font-size: 2.5em;
+            font-weight: 700;
+        }
+        
+        .header p {
+            margin: 10px 0 0 0;
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .setup-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin: 30px 0;
+        }
+        
+        .setup-card {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            padding: 30px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .setup-card:hover {
+            border-color: #667eea;
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.2);
+            transform: translateY(-5px);
+        }
+        
+        .setup-card .icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+            color: #667eea;
+        }
+        
+        .setup-card h3 {
+            color: #333;
+            margin: 15px 0;
+            font-weight: 600;
+        }
+        
+        .setup-card p {
+            color: #666;
+            margin: 10px 0;
+            font-size: 0.95em;
+        }
+        
+        .setup-card .btn {
+            margin-top: 20px;
+            padding: 10px 25px;
+            border-radius: 8px;
+            text-decoration: none;
+            display: inline-block;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary-setup {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .btn-primary-setup:hover {
+            color: white;
+            opacity: 0.9;
+            text-decoration: none;
+        }
+        
+        .btn-secondary-setup {
+            background: #e9ecef;
+            color: #333;
+        }
+        
+        .btn-secondary-setup:hover {
+            background: #d9dfe5;
+            color: #333;
+            text-decoration: none;
+        }
+        
+        .info-box {
+            background: #e7f3ff;
+            border-left: 4px solid #0066cc;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 30px 0;
+        }
+        
+        .info-box h4 {
+            color: #0066cc;
+            margin-bottom: 10px;
+        }
+        
+        .info-box p {
+            margin: 5px 0;
+            color: #004499;
+        }
+        
+        .success-box {
+            background: #d4edda;
+            border-left: 4px solid #28a745;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 30px 0;
+        }
+        
+        .success-box h4 {
+            color: #155724;
+            margin-bottom: 10px;
+        }
+        
+        .success-box p {
+            margin: 5px 0;
+            color: #155724;
+        }
+        
+        .feature-list {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .feature-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #333;
+        }
+        
+        .feature-item i {
+            color: #28a745;
+            font-weight: bold;
+        }
+        
+        @media (max-width: 768px) {
+            .setup-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .feature-list {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 1.8em;
+            }
+            
+            .content {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container-main">
+        <div class="header">
+            <h1>🚗 VehiCare System</h1>
+            <p>Vehicle Maintenance & Service Management</p>
+        </div>
+        
+        <div class="content">
+            <h2 style="color: #333; margin-bottom: 10px;">Welcome!</h2>
+            <p style="color: #666; margin-bottom: 30px;">Your system is ready. Choose a setup option to get started.</p>
+            
+            <!-- Setup Options -->
+            <div class="setup-grid">
+                <!-- Option 1 -->
+                <div class="setup-card">
+                    <div class="icon">
+                        <i class="fas fa-bolt"></i>
+                    </div>
+                    <h3>⚡ Quick Setup</h3>
+                    <p>Fast automatic database creation</p>
+                    <p style="font-size: 0.9em; color: #999;">~5 seconds</p>
+                    <a href="/vehicare_db/setup.php" class="btn btn-primary-setup">
+                        Start Setup
+                    </a>
+                </div>
+                
+                <!-- Option 2 -->
+                <div class="setup-card">
+                    <div class="icon">
+                        <i class="fas fa-hammer"></i>
+                    </div>
+                    <h3>🔧 Manual Setup</h3>
+                    <p>Step-by-step database creation</p>
+                    <p style="font-size: 0.9em; color: #999;">~2-3 seconds (backup option)</p>
+                    <a href="/vehicare_db/setup_manual.php" class="btn btn-secondary-setup">
+                        Start Manual Setup
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Info Box -->
+            <div class="info-box">
+                <h4><i class="fas fa-info-circle"></i> What Setup Does</h4>
+                <p>The setup will create:</p>
+                <div class="feature-list">
+                    <div class="feature-item">
+                        <i class="fas fa-check"></i> 8 Database Tables
+                    </div>
+                    <div class="feature-item">
+                        <i class="fas fa-check"></i> Performance Indexes
+                    </div>
+                    <div class="feature-item">
+                        <i class="fas fa-check"></i> Sample Services
+                    </div>
+                    <div class="feature-item">
+                        <i class="fas fa-check"></i> Test Accounts
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Success Box -->
+            <div class="success-box">
+                <h4><i class="fas fa-rocket"></i> Quick Start</h4>
+                <p><strong>Choose one:</strong></p>
+                <p>1. Click "Start Setup" (recommended - fastest)</p>
+                <p>2. Or click "Start Manual Setup" (if option 1 has issues)</p>
+                <p>3. Wait for success message and get test credentials</p>
+                <p>4. Login with test account</p>
+            </div>
+            
+            <!-- Test Credentials Preview -->
+            <div style="background: #f8f9fa; border: 1px solid #ddd; border-radius: 8px; padding: 20px; margin: 30px 0;">
+                <h4 style="color: #333; margin-bottom: 15px;">📝 Test Credentials (Auto-Created)</h4>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <div>
+                        <h6 style="color: #667eea; margin-bottom: 10px;">Admin Account</h6>
+                        <p style="margin: 5px 0;"><strong>Email:</strong></p>
+                        <p style="margin: 0 0 10px 0; font-family: monospace; background: #fff; padding: 8px; border-radius: 4px;">admin@vehicare.com</p>
+                        <p style="margin: 5px 0;"><strong>Password:</strong></p>
+                        <p style="margin: 0; font-family: monospace; background: #fff; padding: 8px; border-radius: 4px;">admin123</p>
+                    </div>
+                    
+                    <div>
+                        <h6 style="color: #667eea; margin-bottom: 10px;">Customer Account</h6>
+                        <p style="margin: 5px 0;"><strong>Email:</strong></p>
+                        <p style="margin: 0 0 10px 0; font-family: monospace; background: #fff; padding: 8px; border-radius: 4px;">client@vehicare.com</p>
+                        <p style="margin: 5px 0;"><strong>Password:</strong></p>
+                        <p style="margin: 0; font-family: monospace; background: #fff; padding: 8px; border-radius: 4px;">client123</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Features -->
+            <div style="margin-top: 40px; padding-top: 30px; border-top: 1px solid #ddd;">
+                <h3 style="color: #333; margin-bottom: 20px;">✨ What You Get</h3>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <div>
+                        <h5 style="color: #667eea; display: flex; align-items: center; gap: 10px;">
+                            <i class="fas fa-users"></i> Customer Features
+                        </h5>
+                        <ul style="color: #666; line-height: 1.8;">
+                            <li>✓ Profile Management</li>
+                            <li>✓ Vehicle Management</li>
+                            <li>✓ Appointment Booking</li>
+                            <li>✓ Walk-in Queue</li>
+                            <li>✓ Real-time Queue Tracking</li>
+                            <li>✓ Service History</li>
+                            <li>✓ Spending Analytics</li>
+                        </ul>
+                    </div>
+                    
+                    <div>
+                        <h5 style="color: #667eea; display: flex; align-items: center; gap: 10px;">
+                            <i class="fas fa-cog"></i> Admin Features
+                        </h5>
+                        <ul style="color: #666; line-height: 1.8;">
+                            <li>✓ Dashboard Overview</li>
+                            <li>✓ Customer Management</li>
+                            <li>✓ Appointment Control</li>
+                            <li>✓ Queue Processing</li>
+                            <li>✓ Staff Assignment</li>
+                            <li>✓ Revenue Tracking</li>
+                            <li>✓ Analytics & Reporting</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Quick Links -->
+            <div style="margin-top: 40px; padding-top: 30px; border-top: 1px solid #ddd;">
+                <h3 style="color: #333; margin-bottom: 20px;">🔗 Quick Links</h3>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                    <a href="/vehicare_db/login.php" style="display: block; padding: 15px; background: #f8f9fa; border-radius: 8px; text-decoration: none; color: #333; border: 1px solid #ddd; transition: all 0.3s;">
+                        <strong>📌 Login Page</strong>
+                        <p style="margin: 5px 0 0 0; color: #666; font-size: 0.9em;">After setup, login here</p>
+                    </a>
+                    
+                    <a href="/vehicare_db/register.php" style="display: block; padding: 15px; background: #f8f9fa; border-radius: 8px; text-decoration: none; color: #333; border: 1px solid #ddd; transition: all 0.3s;">
+                        <strong>📝 Register</strong>
+                        <p style="margin: 5px 0 0 0; color: #666; font-size: 0.9em;">Create new customer account</p>
+                    </a>
+                    
+                    <a href="/phpmyadmin" style="display: block; padding: 15px; background: #f8f9fa; border-radius: 8px; text-decoration: none; color: #333; border: 1px solid #ddd; transition: all 0.3s;">
+                        <strong>🗄️ phpMyAdmin</strong>
+                        <p style="margin: 5px 0 0 0; color: #666; font-size: 0.9em;">Database management</p>
+                    </a>
+                    
+                    <a href="README.md" style="display: block; padding: 15px; background: #f8f9fa; border-radius: 8px; text-decoration: none; color: #333; border: 1px solid #ddd; transition: all 0.3s;">
+                        <strong>📚 Documentation</strong>
+                        <p style="margin: 5px 0 0 0; color: #666; font-size: 0.9em;">Read the guides</p>
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Footer -->
+            <div style="text-align: center; margin-top: 40px; padding-top: 30px; border-top: 1px solid #ddd;">
+                <p style="color: #999; font-size: 0.9em;">
+                    VehiCare System v1.0 | <strong>Status: ✅ Ready</strong>
+                </p>
+                <p style="color: #999; font-size: 0.85em;">
+                    Everything is set up and ready to go. Choose your setup option above to get started!
+                </p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

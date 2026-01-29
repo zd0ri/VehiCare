@@ -1,10 +1,10 @@
-            </div>
+﻿            </div>
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https:
     <script>
-        // Update time
+        
         function updateTime() {
             const now = new Date();
             const hours = String(now.getHours()).padStart(2, '0');
@@ -19,3 +19,4 @@
     </script>
 </body>
 </html>
+

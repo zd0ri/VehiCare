@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 require_once __DIR__ . '/../includes/config.php';
 
@@ -9,7 +9,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
 
 include __DIR__ . '/../includes/adminHeader.php';
 
-// Handle form submission for adding/editing clients
+
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $full_name = $conn->real_escape_string($_POST['full_name']);
     $phone = $conn->real_escape_string($_POST['phone']);
@@ -17,7 +17,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $address = $conn->real_escape_string($_POST['address']);
     
     if (isset($_POST['client_id']) && !empty($_POST['client_id'])) {
-        // Update
+        
         $client_id = intval($_POST['client_id']);
         $query = "UPDATE clients SET full_name='$full_name', phone='$phone', email='$email', address='$address' WHERE client_id=$client_id";
         if ($conn->query($query)) {
@@ -26,7 +26,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $_SESSION['error'] = "Error updating client: " . $conn->error;
         }
     } else {
-        // Insert
+        
         $query = "INSERT INTO clients (full_name, phone, email, address) VALUES ('$full_name', '$phone', '$email', '$address')";
         if ($conn->query($query)) {
             $_SESSION['success'] = "Client added successfully!";
@@ -38,7 +38,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     exit;
 }
 
-// Fetch clients
+
 $search = '';
 if (isset($_GET['search'])) {
     $search = $conn->real_escape_string($_GET['search']);
@@ -78,7 +78,7 @@ if (isset($_GET['search'])) {
 </div>
 
 <div class="admin-main-content">
-  <h1 style="color: #1a3a52; margin-bottom: 20px;">Manage Clients</h1>
+  <h1 style="color: 
   
   <?php include __DIR__ . '/../includes/alert.php'; ?>
   
@@ -108,7 +108,7 @@ if (isset($_GET['search'])) {
           if ($clientsQuery && $clientsQuery->num_rows > 0) {
             while ($client = $clientsQuery->fetch_assoc()) {
               echo "<tr>
-                <td>#{$client['client_id']}</td>
+                <td>
                 <td>{$client['full_name']}</td>
                 <td>{$client['phone']}</td>
                 <td>{$client['email']}</td>
@@ -192,3 +192,4 @@ function editClient(id, name, phone, email, address) {
 </script>
 
 <?php include __DIR__ . '/../includes/footer.php'; ?>
+

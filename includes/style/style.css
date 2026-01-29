@@ -28,8 +28,8 @@ body {
 
 /* Hero Section */
 .hero {
-  background: linear-gradient(135deg, #d4794a 0%, #e8934b 100%);
-  color: #fff;
+  background: linear-gradient(135deg, #FEF5E7 0%, #FDF8F3 100%) !important;
+  color: #1a3a52 !important;
   padding: 80px 20px;
   min-height: 600px;
   display: flex;
@@ -49,6 +49,7 @@ body {
 }
 
 .hero h1 {
+  color: #1a3a52 !important;
   font-size: 3.5rem;
   font-weight: 700;
   margin-bottom: 15px;
@@ -56,9 +57,10 @@ body {
 }
 
 .hero p {
+  color: #2d5a7b !important;
   font-size: 1.2rem;
   margin-bottom: 30px;
-  opacity: 0.95;
+  opacity: 1;
 }
 
 .hero-cta {
@@ -101,15 +103,26 @@ body {
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
 }
 
-.btn-outline-primary {
-  border: 2px solid #fff;
-  color: #fff;
+.btn-primary {
+  background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+  color: white;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(231, 76, 60, 0.3);
+}
+
+.btn-outline-light {
+  border: 2px solid #4ECDC4;
+  color: #4ECDC4;
   background: transparent;
 }
 
-.btn-outline-primary:hover {
-  background: #fff;
-  color: var(--primary-color);
+.btn-outline-light:hover {
+  background: #4ECDC4;
+  color: #fff;
+  font-weight: 600;
 }
 
 .btn-lg {
@@ -120,13 +133,13 @@ body {
 /* Featured Services */
 .featured-services {
   padding: 80px 20px;
-  background: #fff;
+  background: linear-gradient(135deg, #F0F4F8 0%, #E8EEF5 100%);
 }
 
 .featured-services h2 {
   font-size: 2.5rem;
   margin-bottom: 50px;
-  color: var(--primary-color);
+  color: #1a3a52;
 }
 
 .services-grid {
@@ -145,8 +158,8 @@ body {
 }
 
 .service-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  transform: translateY(-8px);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
   background: #fff;
 }
 
@@ -154,16 +167,21 @@ body {
   font-size: 2.5rem;
   color: var(--secondary-color);
   margin-bottom: 15px;
+  transition: transform 0.3s ease;
+}
+
+.service-card:hover i {
+  transform: scale(1.1);
 }
 
 .service-card h3 {
   font-size: 1.3rem;
   margin-bottom: 15px;
-  color: var(--primary-color);
+  color: inherit;
 }
 
 .service-card p {
-  color: var(--text-color);
+  color: inherit;
   margin-bottom: 15px;
   font-size: 0.95rem;
 }
@@ -215,8 +233,8 @@ body {
 .form-group select:focus,
 .form-group textarea:focus {
   outline: none;
-  border-color: var(--secondary-color);
-  box-shadow: 0 0 0 3px rgba(232, 147, 75, 0.1);
+  border-color: #e74c3c;
+  box-shadow: 0 0 0 4px rgba(231, 76, 60, 0.15);
 }
 
 /* Why Choose Us */
@@ -262,7 +280,7 @@ body {
 
 /* Testimonials Section */
 .testimonials-section {
-  background: linear-gradient(135deg, #2c5aa0 0%, #3a6bb6 100%);
+  background: linear-gradient(135deg, #1a3a52 0%, #2d5a7b 100%);
   color: #fff;
   padding: 80px 20px;
 }
@@ -285,7 +303,7 @@ body {
   background: rgba(255, 255, 255, 0.1);
   padding: 30px;
   border-radius: 10px;
-  border-left: 4px solid var(--accent-color);
+  border-left: 4px solid #e74c3c;
 }
 
 .testimonial-card .stars {
@@ -499,20 +517,23 @@ h1, h2, h3, .navbar-brand {
 
 /* navbar */
 .navbar {
-  background: var(--cream-harvest);
-  box-shadow: 0 2px 8px var(--shadow-color);
+  background: linear-gradient(90deg, #1a3a52 0%, #2d5a7b 100%);
+  box-shadow: 0 2px 8px rgba(26, 58, 82, 0.12);
+  border-bottom: 2px solid #e74c3c;
 }
 .navbar .navbar-brand {
-  color: var(--cocoa-bark) !important;
-  font-weight: 600;
+  color: #fff !important;
+  font-weight: 700;
+  font-size: 1.3rem;
 }
 .navbar .nav-link {
-  color: var(--cocoa-bark) !important;
+  color: #fff !important;
   transition: color 0.3s ease;
+  font-weight: 500;
 }
 .navbar .nav-link:hover,
 .navbar .nav-link.active {
-  color: var(--chestnut-grove) !important;
+  color: #e74c3c !important;
 }
 
 /*only to the product area */

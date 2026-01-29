@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 require_once __DIR__ . '/../includes/config.php';
 
@@ -9,7 +9,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
 
 include __DIR__ . '/../includes/adminHeader.php';
 
-// Fetch appointments
+
 $appointmentsQuery = $conn->query("
   SELECT a.*, c.full_name, v.car_brand, v.car_model, s.service_name
   FROM appointments a
@@ -41,12 +41,12 @@ $appointmentsQuery = $conn->query("
 </div>
 
 <div class="admin-main-content">
-  <h1 style="color: #1a3a52; margin-bottom: 20px;">Manage Appointments</h1>
+  <h1 style="color: 
   
   <div class="table-container">
     <div class="table-header">
       <h3>All Appointments</h3>
-      <a href="/vehicare_db/index.php#appointment" class="btn btn-primary btn-sm"><i class="fas fa-calendar-plus"></i> New Appointment</a>
+      <a href="/vehicare_db/index.php
     </div>
     <div style="overflow-x: auto;">
       <table class="table">
@@ -71,7 +71,7 @@ $appointmentsQuery = $conn->query("
               if ($apt['status'] == 'Cancelled') $statusBadge = 'badge-danger';
               
               echo "<tr>
-                <td>#{$apt['appointment_id']}</td>
+                <td>
                 <td>{$apt['full_name']}</td>
                 <td>{$apt['car_brand']} {$apt['car_model']}</td>
                 <td>{$apt['service_name']}</td>
@@ -98,3 +98,4 @@ $appointmentsQuery = $conn->query("
 </div>
 
 <?php include __DIR__ . '/../includes/footer.php'; ?>
+

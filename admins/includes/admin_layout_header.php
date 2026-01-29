@@ -1,15 +1,5 @@
-<?php
-/**
- * Admin Layout Template
- * Include this file to use consistent admin layout across all pages
- * 
- * Usage:
- * 1. Define $page_title before including
- * 2. Define $page_icon before including (optional)
- * 3. Include this file
- * 4. Your content goes here
- * 5. Include admin_layout_footer.php
- */
+﻿<?php
+
 
 if (!isset($page_title)) {
     $page_title = 'Admin Panel';
@@ -25,9 +15,9 @@ if (!isset($page_icon)) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo htmlspecialchars($page_title); ?> - VehiCare</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https:
+    <link rel="stylesheet" href="https:
+    <link href="https:
     <style>
         * {
             margin: 0;
@@ -37,7 +27,7 @@ if (!isset($page_icon)) {
 
         body {
             font-family: 'Poppins', sans-serif;
-            background: #f5f7fa;
+            background: 
         }
 
         .admin-wrapper {
@@ -45,10 +35,10 @@ if (!isset($page_icon)) {
             min-height: 100vh;
         }
 
-        /* Sidebar Navigation */
+        
         .sidebar {
             width: 220px;
-            background: linear-gradient(180deg, #0052cc 0%, #0052cc 100%);
+            background: linear-gradient(180deg, 
             position: fixed;
             height: 100vh;
             overflow-y: auto;
@@ -68,13 +58,13 @@ if (!isset($page_icon)) {
 
         .sidebar-brand i {
             font-size: 32px;
-            color: #fff;
+            color: 
             display: block;
             margin-bottom: 10px;
         }
 
         .sidebar-brand h5 {
-            color: #fff;
+            color: 
             font-weight: 700;
             margin: 0;
             font-size: 16px;
@@ -102,8 +92,8 @@ if (!isset($page_icon)) {
         .sidebar-menu a:hover,
         .sidebar-menu a.active {
             background: rgba(255, 255, 255, 0.1);
-            color: #fff;
-            border-left-color: #ff6b6b;
+            color: 
+            border-left-color: 
         }
 
         .sidebar-menu i {
@@ -111,7 +101,7 @@ if (!isset($page_icon)) {
             width: 20px;
         }
 
-        /* Main Content */
+        
         .main-content {
             margin-left: 220px;
             flex: 1;
@@ -119,20 +109,20 @@ if (!isset($page_icon)) {
             flex-direction: column;
         }
 
-        /* Header */
+        
         .admin-header {
-            background: #fff;
+            background: 
             padding: 20px 30px;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 1px solid #e0e0e0;
+            border-bottom: 1px solid 
         }
 
         .header-left h2 {
             margin: 0;
-            color: #333;
+            color: 
             font-weight: 700;
             font-size: 24px;
         }
@@ -145,7 +135,7 @@ if (!isset($page_icon)) {
 
         .header-time {
             font-size: 14px;
-            color: #666;
+            color: 
             font-weight: 500;
         }
 
@@ -154,7 +144,7 @@ if (!isset($page_icon)) {
             align-items: center;
             gap: 10px;
             padding: 8px 15px;
-            background: #f0f0f0;
+            background: 
             border-radius: 20px;
             cursor: pointer;
         }
@@ -162,7 +152,7 @@ if (!isset($page_icon)) {
         .header-user i {
             width: 30px;
             height: 30px;
-            background: #0052cc;
+            background: 
             color: white;
             border-radius: 50%;
             display: flex;
@@ -171,19 +161,19 @@ if (!isset($page_icon)) {
             font-size: 14px;
         }
 
-        /* Content Area */
+        
         .content-area {
             flex: 1;
             padding: 30px;
             overflow-y: auto;
         }
 
-        /* Card Styles */
+        
         .admin-card {
             background: white;
             border-radius: 10px;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-            border: 1px solid #e0e0e0;
+            border: 1px solid 
             padding: 20px;
             margin-bottom: 20px;
         }
@@ -194,36 +184,36 @@ if (!isset($page_icon)) {
             align-items: center;
             margin-bottom: 20px;
             padding-bottom: 15px;
-            border-bottom: 1px solid #e0e0e0;
+            border-bottom: 1px solid 
         }
 
         .card-header h3 {
             margin: 0;
-            color: #333;
+            color: 
             font-weight: 700;
             font-size: 18px;
         }
 
         .card-header-link {
-            color: #0052cc;
+            color: 
             text-decoration: none;
             font-size: 12px;
             font-weight: 600;
         }
 
-        /* Table Styles */
+        
         .admin-table {
             width: 100%;
             border-collapse: collapse;
         }
 
         .admin-table thead {
-            background: #f5f7fa;
-            border-bottom: 2px solid #e0e0e0;
+            background: 
+            border-bottom: 2px solid 
         }
 
         .admin-table thead th {
-            color: #666;
+            color: 
             font-weight: 600;
             padding: 14px 16px;
             text-align: left;
@@ -234,16 +224,16 @@ if (!isset($page_icon)) {
 
         .admin-table tbody td {
             padding: 14px 16px;
-            border-bottom: 1px solid #e0e0e0;
+            border-bottom: 1px solid 
             font-size: 13px;
-            color: #333;
+            color: 
         }
 
         .admin-table tbody tr:hover {
-            background: #f9f9f9;
+            background: 
         }
 
-        /* Responsive */
+        
         @media (max-width: 768px) {
             .sidebar {
                 width: 0;
@@ -275,15 +265,35 @@ if (!isset($page_icon)) {
             </div>
             <ul class="sidebar-menu">
                 <li><a href="/vehicare_db/admins/dashboard.php"><i class="fas fa-chart-line"></i> Dashboard</a></li>
-                <li><a href="/vehicare_db/admins/users.php"><i class="fas fa-users"></i> Users</a></li>
-                <li><a href="/vehicare_db/admins/clients.php"><i class="fas fa-user-tie"></i> Clients</a></li>
-                <li><a href="/vehicare_db/admins/vehicles.php"><i class="fas fa-car"></i> Vehicles</a></li>
-                <li><a href="/vehicare_db/admins/appointments.php"><i class="fas fa-calendar"></i> Appointments</a></li>
+                
+                <!-- Booking & Service Management -->
+                <li style="margin-top: 20px; padding: 10px 20px; color: rgba(255,255,255,0.5); font-size: 11px; text-transform: uppercase; font-weight: 600;">Bookings & Services</li>
+                <li><a href="/vehicare_db/admins/appointments_bookings.php"><i class="fas fa-calendar-check"></i> Appointments & Bookings</a></li>
                 <li><a href="/vehicare_db/admins/services.php"><i class="fas fa-cogs"></i> Services</a></li>
-                <li><a href="/vehicare_db/admins/staff.php"><i class="fas fa-people-group"></i> Staff</a></li>
-                <li><a href="/vehicare_db/admins/parts.php"><i class="fas fa-box"></i> Parts</a></li>
-                <li><a href="/vehicare_db/admins/payments.php"><i class="fas fa-money-bill"></i> Payments</a></li>
-                <li><a href="/vehicare_db/logout.php"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+                <li><a href="/vehicare_db/admins/queue_notifications.php"><i class="fas fa-hourglass"></i> Queue Management</a></li>
+                
+                <!-- Customer Management -->
+                <li style="margin-top: 20px; padding: 10px 20px; color: rgba(255,255,255,0.5); font-size: 11px; text-transform: uppercase; font-weight: 600;">Customer Management</li>
+                <li><a href="/vehicare_db/admins/customers.php"><i class="fas fa-users"></i> Customers</a></li>
+                <li><a href="/vehicare_db/admins/vehicles.php"><i class="fas fa-car"></i> Vehicle Information</a></li>
+                
+                <!-- Financial Management -->
+                <li style="margin-top: 20px; padding: 10px 20px; color: rgba(255,255,255,0.5); font-size: 11px; text-transform: uppercase; font-weight: 600;">Financial</li>
+                <li><a href="/vehicare_db/admins/payment_management.php"><i class="fas fa-credit-card"></i> Payment System</a></li>
+                <li><a href="/vehicare_db/admins/billing_invoices.php"><i class="fas fa-file-invoice-dollar"></i> Billing & Invoices</a></li>
+                
+                <!-- Inventory & Staff -->
+                <li style="margin-top: 20px; padding: 10px 20px; color: rgba(255,255,255,0.5); font-size: 11px; text-transform: uppercase; font-weight: 600;">Operations</li>
+                <li><a href="/vehicare_db/admins/inventory_management.php"><i class="fas fa-warehouse"></i> Inventory Management</a></li>
+                <li><a href="/vehicare_db/admins/staff.php"><i class="fas fa-people-group"></i> Staff Management</a></li>
+                <li><a href="/vehicare_db/admins/staff_ratings_reports.php"><i class="fas fa-star"></i> Staff Ratings & Reports</a></li>
+                
+                <!-- System Management -->
+                <li style="margin-top: 20px; padding: 10px 20px; color: rgba(255,255,255,0.5); font-size: 11px; text-transform: uppercase; font-weight: 600;">System</li>
+                <li><a href="/vehicare_db/admins/users.php"><i class="fas fa-user-shield"></i> Users</a></li>
+                <li><a href="/vehicare_db/admins/audit_logs.php"><i class="fas fa-history"></i> Audit Logs</a></li>
+                
+                <li style="margin-top: 20px;"><a href="/vehicare_db/logout.php"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
             </ul>
         </aside>
 
@@ -305,3 +315,4 @@ if (!isset($page_icon)) {
 
             <!-- Content -->
             <div class="content-area">
+

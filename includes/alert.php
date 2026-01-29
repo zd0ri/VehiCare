@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 if (isset($_SESSION['message'])) {
     echo "<div class='alert alert-danger alert-dismissible fade show' role='alert' style='margin: 20px;'>
     <i class='fas fa-exclamation-circle'></i> <strong>{$_SESSION['message']}</strong>

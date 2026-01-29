@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 require_once __DIR__ . '/../includes/config.php';
 
@@ -9,7 +9,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
 
 include __DIR__ . '/../includes/adminHeader.php';
 
-// Fetch staff
+
 $staffQuery = $conn->query("SELECT * FROM staff ORDER BY staff_id DESC");
 ?>
 
@@ -28,7 +28,7 @@ $staffQuery = $conn->query("SELECT * FROM staff ORDER BY staff_id DESC");
 </div>
 
 <div class="admin-main-content">
-  <h1 style="color: #1a3a52; margin-bottom: 20px;">Manage Staff</h1>
+  <h1 style="color: 
   
   <div class="table-container">
     <div class="table-header">
@@ -51,7 +51,7 @@ $staffQuery = $conn->query("SELECT * FROM staff ORDER BY staff_id DESC");
           if ($staffQuery && $staffQuery->num_rows > 0) {
             while ($staff = $staffQuery->fetch_assoc()) {
               echo "<tr>
-                <td>#{$staff['staff_id']}</td>
+                <td>
                 <td>{$staff['full_name']}</td>
                 <td>{$staff['position']}</td>
                 <td>{$staff['contact']}</td>
@@ -75,3 +75,4 @@ $staffQuery = $conn->query("SELECT * FROM staff ORDER BY staff_id DESC");
 </div>
 
 <?php include __DIR__ . '/../includes/footer.php'; ?>
+

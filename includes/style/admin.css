@@ -1,27 +1,27 @@
-/* VehiCare Admin Dashboard Styles */
+﻿
 
 :root {
-  --primary-color: #1a3a52;
-  --secondary-color: #2d5a7b;
-  --accent-color: #e74c3c;
-  --success-color: #27ae60;
-  --warning-color: #f39c12;
-  --danger-color: #e74c3c;
-  --light-gray: #ecf0f1;
-  --dark-gray: #34495e;
-  --text-color: #333;
-  --border-color: #bdc3c7;
+  --primary-color: 
+  --secondary-color: 
+  --accent-color: 
+  --success-color: 
+  --warning-color: 
+  --danger-color: 
+  --light-gray: 
+  --dark-gray: 
+  --text-color: 
+  --border-color: 
 }
-  --admin-bg: #f8f9fa;
-  --admin-card: #fffbf4;
-  --admin-text: #5A4939;
+  --admin-bg: 
+  --admin-card: 
+  --admin-text: 
   --admin-text-light: rgb(109, 96, 83);
-  --admin-border: #dfe6e9;
+  --admin-border: 
   --admin-success: rgb(109, 96, 83);
-  --admin-danger: #5A4939;
+  --admin-danger: 
 }
 
-/* Admin-mode navbar (compact topbar) */
+
 body.admin-mode .navbar {
   background: linear-gradient(90deg, var(--admin-primary) 0%, var(--admin-primary-dark) 100%);
   box-shadow: 0 4px 12px rgba(108, 92, 231, 0.15);
@@ -29,7 +29,7 @@ body.admin-mode .navbar {
 }
 
 body.admin-mode .navbar .navbar-brand {
-  color: #fff !important;
+  color: 
   font-size: 1.3rem;
   font-weight: 700;
   letter-spacing: 0.5px;
@@ -45,13 +45,13 @@ body.admin-mode .navbar .nav-link {
 
 body.admin-mode .navbar .nav-link:hover,
 body.admin-mode .navbar .nav-link.active {
-  color: #fff !important;
+  color: 
   background: rgba(255, 255, 255, 0.15);
   border-radius: 6px;
 }
 
 body.admin-mode .navbar .dropdown-menu {
-  background: #fff;
+  background: 
   border: none;
   box-shadow: 0 6px 20px rgba(108, 92, 231, 0.18);
   border-radius: 8px;
@@ -65,11 +65,11 @@ body.admin-mode .navbar .dropdown-item {
 
 body.admin-mode .navbar .dropdown-item:hover,
 body.admin-mode .navbar .dropdown-item.active {
-  background: #f0e9ff;
+  background: 
   color: var(--admin-primary);
 }
 
-/* Admin search bar (centered, prominent) */
+
 body.admin-mode .navbar .d-flex.me-3 {
   flex: 0 1 300px;
   margin: 0 auto !important;
@@ -89,7 +89,7 @@ body.admin-mode .navbar .form-control::placeholder {
 }
 
 body.admin-mode .navbar .btn-outline-success {
-  color: #fff;
+  color: 
   border: 1px solid rgba(255, 255, 255, 0.4);
   background: transparent;
   border-radius: 6px;
@@ -99,16 +99,16 @@ body.admin-mode .navbar .btn-outline-success {
 body.admin-mode .navbar .btn-outline-success:hover {
   background: rgba(255, 255, 255, 0.2);
   border-color: rgba(255, 255, 255, 0.6);
-  color: #fff;
+  color: 
 }
 
-/* Admin icons & buttons */
+
 body.admin-mode .navbar .text-dark {
-  color: #fff !important;
+  color: 
 }
 
 body.admin-mode .navbar .btn-outline-primary {
-  color: #fff;
+  color: 
   border: 1px solid rgba(255, 255, 255, 0.4);
   background: transparent;
   border-radius: 6px;
@@ -118,13 +118,13 @@ body.admin-mode .navbar .btn-outline-primary {
 }
 
 body.admin-mode .navbar .btn-outline-primary:hover {
-  background: #5A4939;
+  background: 
   border-color: rgba(255, 255, 255, 0.6);
-  color: #fff;
+  color: 
 }
 
 body.admin-mode .navbar .btn-outline-danger {
-  color: #7b5a49;
+  color: 
   border: 1px solid rgb(109, 96, 83);
   background: transparent;
   border-radius: 6px;
@@ -134,17 +134,17 @@ body.admin-mode .navbar .btn-outline-danger {
 }
 
 body.admin-mode .navbar .btn-outline-danger:hover {
-  background: #fff6f1;
-  color: #3a2f1f;
+  background: 
+  color: 
 }
 
-/* Admin background & page body */
+
 body.admin-mode {
   background: var(--admin-bg);
   color: var(--admin-text);
 }
 
-/* Admin cards & containers */
+
 body.admin-mode .card {
   background: var(--admin-card);
   border: 1px solid var(--admin-border);
@@ -153,7 +153,7 @@ body.admin-mode .card {
 }
 
 body.admin-mode .card-header {
-  background: #f8f9fa;
+  background: 
   border-bottom: 1px solid var(--admin-border);
   font-weight: 600;
   color: var(--admin-text);
@@ -163,13 +163,13 @@ body.admin-mode .card-body {
   padding: 20px;
 }
 
-/* Admin tables */
+
 body.admin-mode .table {
   color: var(--admin-text);
 }
 
 body.admin-mode .table thead {
-  background: #f1f3f5;
+  background: 
   border-top: 1px solid var(--admin-border);
   border-bottom: 2px solid var(--admin-border);
 }
@@ -187,10 +187,10 @@ body.admin-mode .table tbody td {
 }
 
 body.admin-mode .table tbody tr:hover {
-  background: #f8f9fa;
+  background: 
 }
 
-/* Admin buttons */
+
 body.admin-mode .btn-primary,
 body.admin-mode .btn-dark {
   background: var(--admin-primary);
@@ -204,7 +204,7 @@ body.admin-mode .btn-dark {
 body.admin-mode .btn-primary:hover,
 body.admin-mode .btn-dark:hover {
   background: var(--admin-primary-dark);
-  box-shadow: 0 4px 12px #FAF3E3;
+  box-shadow: 0 4px 12px 
 }
 
 body.admin-mode .btn-outline-secondary {
@@ -231,10 +231,10 @@ body.admin-mode .btn-danger {
 }
 
 body.admin-mode .btn-danger:hover {
-  background: #2C1A11;
+  background: 
 }
 
-/* Admin sidebar */
+
 body.admin-mode .admin-sidebar {
   width: 220px;
 }
@@ -252,16 +252,16 @@ body.admin-mode .admin-sidebar .list-group-item {
 }
 
 body.admin-mode .admin-sidebar .list-group-item:hover {
-  background: #f0e9ff;
+  background: 
   color: var(--admin-primary);
 }
 
 body.admin-mode .admin-sidebar .list-group-item.active {
   background: var(--admin-primary);
-  color: #fff;
+  color: 
 }
 
-/* Admin cards with badge */
+
 body.admin-mode .admin-card {
   background: var(--admin-card);
   border: 1px solid var(--admin-border);
@@ -274,14 +274,14 @@ body.admin-mode .admin-card h5 {
   font-weight: 700;
 }
 
-/* Admin modals */
+
 body.admin-mode .modal-content {
   border-radius: 10px;
   border: 1px solid var(--admin-border);
 }
 
 body.admin-mode .modal-header {
-  background: #f8f9fa;
+  background: 
   border-bottom: 1px solid var(--admin-border);
 }
 
@@ -289,10 +289,10 @@ body.admin-mode .modal-header .btn-close {
   background: transparent;
 }
 
-/* Admin form controls */
+
 body.admin-mode .form-control,
 body.admin-mode .form-select {
-  background: #fff;
+  background: 
   border: 1px solid var(--admin-border);
   color: var(--admin-text);
   border-radius: 6px;
@@ -303,10 +303,10 @@ body.admin-mode .form-select {
 body.admin-mode .form-control:focus,
 body.admin-mode .form-select:focus {
   border-color: var(--admin-primary);
-  box-shadow: 0 0 0 3px #FAF3E3;
+  box-shadow: 0 0 0 3px 
 }
 
-/* Admin badges */
+
 body.admin-mode .badge {
   border-radius: 6px;
   padding: 6px 10px;
@@ -325,7 +325,7 @@ body.admin-mode .badge-danger {
   background: var(--admin-danger);
 }
 
-/* Admin hero & headings */
+
 body.admin-mode h2,
 body.admin-mode h3 {
   color: var(--admin-text);
@@ -348,7 +348,7 @@ body.admin-mode .admin-hero p {
   margin: 6px 0 0 0;
 }
 
-/* Admin responsive */
+
 @media (max-width: 768px) {
   body.admin-mode .admin-sidebar {
     width: 100%;
@@ -364,3 +364,4 @@ body.admin-mode .admin-hero p {
     flex: 1;
   }
 }
+
