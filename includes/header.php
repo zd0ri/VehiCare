@@ -90,7 +90,7 @@
 </head>
 
 <body>
-  <nav class="navbar navbar-expand-lg" style="background: linear-gradient(135deg, #1a3a52 0%, #2d5a7b 100%); box-shadow: 0 2px 12px rgba(0,0,0,0.1);">
+  <nav class="navbar dark navbar-expand-lg">
     <div class="container-fluid">
       <a class="navbar-brand" href="/vehicare_db/index.php" style="font-size: 24px; font-weight: 700; color: #fff; display: flex; align-items: center;">
         <i class="fas fa-car" style="margin-right: 8px;"></i> VehiCare

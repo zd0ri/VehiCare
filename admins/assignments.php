@@ -7,18 +7,24 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
     exit;
 }
 
-// Fetch all clients
-$clientsQuery = $conn->query("SELECT * FROM users WHERE role = 'client' ORDER BY full_name");
+$assignments = $conn->query("
+    SELECT a.*, u.full_name as client_name, s.staff_name, st.service_name
+    FROM assignments a
+    JOIN appointments ap ON a.appointment_id = ap.appointment_id
+    JOIN users u ON ap.client_id = u.user_id
+    JOIN staff s ON a.staff_id = s.staff_id
+    JOIN services st ON ap.service_id = st.service_id
+    ORDER BY a.assigned_date DESC
+");
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Clients - VehiCare Admin</title>
+    <title>Technician Assignments - VehiCare Admin</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
             --teal-color: #0ea5a4;
@@ -74,9 +80,6 @@ $clientsQuery = $conn->query("SELECT * FROM users WHERE role = 'client' ORDER BY
             border-radius: 8px;
             margin-bottom: 30px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
         }
         
         .page-header h1 {
@@ -100,21 +103,6 @@ $clientsQuery = $conn->query("SELECT * FROM users WHERE role = 'client' ORDER BY
         .data-table tbody tr:hover {
             background: #f8f9fa;
         }
-        
-        .modal-header {
-            background: linear-gradient(135deg, var(--teal-dark) 0%, var(--teal-color) 100%);
-            color: #fff;
-        }
-        
-        .btn-primary {
-            background: linear-gradient(135deg, var(--teal-dark) 0%, var(--teal-color) 100%);
-            border: none;
-        }
-        
-        .btn-primary:hover {
-            background: var(--teal-dark);
-            color: #fff;
-        }
     </style>
 </head>
 <body>
@@ -127,11 +115,11 @@ $clientsQuery = $conn->query("SELECT * FROM users WHERE role = 'client' ORDER BY
         
         <a href="/vehicare_db/admins/index.php"><i class="fas fa-dashboard"></i>Dashboard</a>
         <a href="/vehicare_db/admins/appointments.php"><i class="fas fa-calendar"></i>Appointments</a>
-        <a href="/vehicare_db/admins/walk_in_booking.php"><i class="fas fa-door-open"></i>Walk-In Bookings</a>
-        <a href="/vehicare_db/admins/clients.php" class="active"><i class="fas fa-users"></i>Clients</a>
+        <a href="/vehicare_db/admins/walk_in_booking.php"><i class="fas fa-door-open"></i>Walk-In</a>
+        <a href="/vehicare_db/admins/clients.php"><i class="fas fa-users"></i>Clients</a>
         <a href="/vehicare_db/admins/vehicles.php"><i class="fas fa-car"></i>Vehicles</a>
         <a href="/vehicare_db/admins/technicians.php"><i class="fas fa-tools"></i>Technicians</a>
-        <a href="/vehicare_db/admins/assignments.php"><i class="fas fa-tasks"></i>Assignments</a>
+        <a href="/vehicare_db/admins/assignments.php" class="active"><i class="fas fa-tasks"></i>Assignments</a>
         <a href="/vehicare_db/admins/queue.php"><i class="fas fa-list-ol"></i>Queue</a>
         <a href="/vehicare_db/admins/inventory.php"><i class="fas fa-boxes"></i>Inventory</a>
         <a href="/vehicare_db/admins/payments.php"><i class="fas fa-credit-card"></i>Payments</a>
@@ -144,42 +132,38 @@ $clientsQuery = $conn->query("SELECT * FROM users WHERE role = 'client' ORDER BY
     
     <main class="main-content">
         <div class="page-header">
-            <h1>Manage Clients</h1>
-            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addModal">
-                <i class="fas fa-plus"></i> Add New Client
-            </button>
+            <h1>Technician Assignments</h1>
         </div>
         
         <div class="data-table">
             <table class="table table-hover mb-0">
                 <thead>
                     <tr>
-                        <th>ID</th>
-                        <th>Full Name</th>
-                        <th>Phone</th>
-                        <th>Email</th>
-                        <th>Address</th>
+                        <th>Technician</th>
+                        <th>Client</th>
+                        <th>Service</th>
+                        <th>Assigned Date</th>
+                        <th>Status</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <?php if ($clientsQuery && $clientsQuery->num_rows > 0): ?>
-                        <?php while ($client = $clientsQuery->fetch_assoc()): ?>
+                    <?php if ($assignments && $assignments->num_rows > 0): ?>
+                        <?php while ($assign = $assignments->fetch_assoc()): ?>
                         <tr>
-                            <td><strong>#<?php echo $client['user_id']; ?></strong></td>
-                            <td><?php echo htmlspecialchars($client['full_name']); ?></td>
-                            <td><?php echo htmlspecialchars($client['phone'] ?? 'N/A'); ?></td>
-                            <td><?php echo htmlspecialchars($client['email']); ?></td>
-                            <td><?php echo htmlspecialchars($client['address'] ?? 'N/A'); ?></td>
+                            <td><strong><?php echo htmlspecialchars($assign['first_name'] . ' ' . $assign['staff_name']); ?></strong></td>
+                            <td><?php echo htmlspecialchars($assign['client_name']); ?></td>
+                            <td><?php echo htmlspecialchars($assign['service_name']); ?></td>
+                            <td><?php echo date('M d, Y', strtotime($assign['assigned_date'])); ?></td>
+                            <td><span class="badge bg-warning">Assigned</span></td>
                             <td>
-                                <button class="btn btn-sm btn-warning"><i class="fas fa-edit"></i></button>
-                                <button class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></button>
+                                <button class="btn btn-sm btn-info"><i class="fas fa-eye"></i></button>
                             </td>
                         </tr>
                         <?php endwhile; ?>
                     <?php else: ?>
                         <tr>
-                            <td colspan="6" class="text-center py-4 text-muted">No clients found</td>
+                            <td colspan="6" class="text-center py-4 text-muted">No assignments found</td>
                         </tr>
                     <?php endif; ?>
                 </tbody>

@@ -1,24 +1,14 @@
-/* VehiCare Admin Dashboard Styles */
+/* VehiCare Admin Dashboard Stylesheet */
 
 :root {
-  --primary-color: #1a3a52;
-  --secondary-color: #2d5a7b;
-  --accent-color: #e74c3c;
-  --success-color: #27ae60;
-  --warning-color: #f39c12;
-  --danger-color: #e74c3c;
-  --light-gray: #ecf0f1;
-  --dark-gray: #34495e;
-  --text-color: #333;
-  --border-color: #bdc3c7;
-}
-  --admin-bg: #f8f9fa;
-  --admin-card: #fffbf4;
-  --admin-text: #5A4939;
-  --admin-text-light: rgb(109, 96, 83);
-  --admin-border: #dfe6e9;
-  --admin-success: rgb(109, 96, 83);
-  --admin-danger: #5A4939;
+    --teal-color: #0ea5a4;
+    --teal-dark: #0b7f7f;
+    --primary: #d4794a;
+    --secondary: #e8934b;
+    --light-gray: #f5f7fa;
+    --border-color: #e0e6ed;
+    --text-dark: #2c3e50;
+    --text-muted: #7f8c8d;
 }
 
 /* Admin-mode navbar (compact topbar) */

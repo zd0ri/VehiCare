@@ -7,18 +7,16 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
     exit;
 }
 
-// Fetch all clients
-$clientsQuery = $conn->query("SELECT * FROM users WHERE role = 'client' ORDER BY full_name");
+$inventory = $conn->query("SELECT p.*, i.quantity, i.last_updated FROM parts p LEFT JOIN inventory i ON p.part_id = i.part_id ORDER BY p.part_name");
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Clients - VehiCare Admin</title>
+    <title>Inventory Management - VehiCare Admin</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
             --teal-color: #0ea5a4;
@@ -100,21 +98,6 @@ $clientsQuery = $conn->query("SELECT * FROM users WHERE role = 'client' ORDER BY
         .data-table tbody tr:hover {
             background: #f8f9fa;
         }
-        
-        .modal-header {
-            background: linear-gradient(135deg, var(--teal-dark) 0%, var(--teal-color) 100%);
-            color: #fff;
-        }
-        
-        .btn-primary {
-            background: linear-gradient(135deg, var(--teal-dark) 0%, var(--teal-color) 100%);
-            border: none;
-        }
-        
-        .btn-primary:hover {
-            background: var(--teal-dark);
-            color: #fff;
-        }
     </style>
 </head>
 <body>
@@ -127,13 +110,13 @@ $clientsQuery = $conn->query("SELECT * FROM users WHERE role = 'client' ORDER BY
         
         <a href="/vehicare_db/admins/index.php"><i class="fas fa-dashboard"></i>Dashboard</a>
         <a href="/vehicare_db/admins/appointments.php"><i class="fas fa-calendar"></i>Appointments</a>
-        <a href="/vehicare_db/admins/walk_in_booking.php"><i class="fas fa-door-open"></i>Walk-In Bookings</a>
-        <a href="/vehicare_db/admins/clients.php" class="active"><i class="fas fa-users"></i>Clients</a>
+        <a href="/vehicare_db/admins/walk_in_booking.php"><i class="fas fa-door-open"></i>Walk-In</a>
+        <a href="/vehicare_db/admins/clients.php"><i class="fas fa-users"></i>Clients</a>
         <a href="/vehicare_db/admins/vehicles.php"><i class="fas fa-car"></i>Vehicles</a>
         <a href="/vehicare_db/admins/technicians.php"><i class="fas fa-tools"></i>Technicians</a>
         <a href="/vehicare_db/admins/assignments.php"><i class="fas fa-tasks"></i>Assignments</a>
         <a href="/vehicare_db/admins/queue.php"><i class="fas fa-list-ol"></i>Queue</a>
-        <a href="/vehicare_db/admins/inventory.php"><i class="fas fa-boxes"></i>Inventory</a>
+        <a href="/vehicare_db/admins/inventory.php" class="active"><i class="fas fa-boxes"></i>Inventory</a>
         <a href="/vehicare_db/admins/payments.php"><i class="fas fa-credit-card"></i>Payments</a>
         <a href="/vehicare_db/admins/invoices.php"><i class="fas fa-receipt"></i>Invoices</a>
         <a href="/vehicare_db/admins/ratings.php"><i class="fas fa-star"></i>Ratings</a>
@@ -144,33 +127,40 @@ $clientsQuery = $conn->query("SELECT * FROM users WHERE role = 'client' ORDER BY
     
     <main class="main-content">
         <div class="page-header">
-            <h1>Manage Clients</h1>
-            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addModal">
-                <i class="fas fa-plus"></i> Add New Client
-            </button>
+            <h1>Inventory Management</h1>
+            <button class="btn btn-primary"><i class="fas fa-plus"></i> Add Part</button>
         </div>
         
         <div class="data-table">
             <table class="table table-hover mb-0">
                 <thead>
                     <tr>
-                        <th>ID</th>
-                        <th>Full Name</th>
-                        <th>Phone</th>
-                        <th>Email</th>
-                        <th>Address</th>
+                        <th>Part Name</th>
+                        <th>Brand</th>
+                        <th>Price</th>
+                        <th>Stock</th>
+                        <th>Quantity</th>
+                        <th>Last Updated</th>
+                        <th>Status</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <?php if ($clientsQuery && $clientsQuery->num_rows > 0): ?>
-                        <?php while ($client = $clientsQuery->fetch_assoc()): ?>
+                    <?php if ($inventory && $inventory->num_rows > 0): ?>
+                        <?php while ($item = $inventory->fetch_assoc()): ?>
                         <tr>
-                            <td><strong>#<?php echo $client['user_id']; ?></strong></td>
-                            <td><?php echo htmlspecialchars($client['full_name']); ?></td>
-                            <td><?php echo htmlspecialchars($client['phone'] ?? 'N/A'); ?></td>
-                            <td><?php echo htmlspecialchars($client['email']); ?></td>
-                            <td><?php echo htmlspecialchars($client['address'] ?? 'N/A'); ?></td>
+                            <td><strong><?php echo htmlspecialchars($item['part_name']); ?></strong></td>
+                            <td><?php echo htmlspecialchars($item['brand'] ?? 'N/A'); ?></td>
+                            <td>₱<?php echo number_format($item['price'] ?? 0, 2); ?></td>
+                            <td><?php echo $item['stock'] ?? 0; ?></td>
+                            <td><?php echo $item['quantity'] ?? 0; ?></td>
+                            <td><?php echo $item['last_updated'] ? date('M d, Y', strtotime($item['last_updated'])) : 'N/A'; ?></td>
+                            <td>
+                                <?php $qty = $item['quantity'] ?? 0; ?>
+                                <span class="badge bg-<?php echo $qty > 5 ? 'success' : ($qty > 0 ? 'warning' : 'danger'); ?>">
+                                    <?php echo $qty > 5 ? 'In Stock' : ($qty > 0 ? 'Low Stock' : 'Out of Stock'); ?>
+                                </span>
+                            </td>
                             <td>
                                 <button class="btn btn-sm btn-warning"><i class="fas fa-edit"></i></button>
                                 <button class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></button>
@@ -179,7 +169,7 @@ $clientsQuery = $conn->query("SELECT * FROM users WHERE role = 'client' ORDER BY
                         <?php endwhile; ?>
                     <?php else: ?>
                         <tr>
-                            <td colspan="6" class="text-center py-4 text-muted">No clients found</td>
+                            <td colspan="8" class="text-center py-4 text-muted">No inventory items found</td>
                         </tr>
                     <?php endif; ?>
                 </tbody>

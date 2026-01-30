@@ -38,7 +38,12 @@ CREATE TABLE `users` (
   `status` enum('active','inactive','suspended') DEFAULT 'active',
   `created_date` datetime DEFAULT CURRENT_TIMESTAMP,
   `updated_date` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `last_login` datetime DEFAULT NULL
+  `last_login` datetime DEFAULT NULL,
+  `profile_picture` varchar(255) DEFAULT NULL,
+  `address` text DEFAULT NULL,
+  `city` varchar(100) DEFAULT NULL,
+  `state` varchar(100) DEFAULT NULL,
+  `zip_code` varchar(20) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -545,6 +550,150 @@ ALTER TABLE `servicehistory`
 --
 ALTER TABLE `vehicles`
   ADD CONSTRAINT `vehicles_ibfk_1` FOREIGN KEY (`client_id`) REFERENCES `clients` (`client_id`);
+
+-- --------------------------------------------------------
+-- Seed Data: Admin & Staff accounts
+-- --------------------------------------------------------
+-- Insert Admin Account
+-- Email: admin@vehicare.com
+-- Password: VehiCare@2026Admin (stored as bcrypt hash)
+INSERT INTO users (username, email, password, full_name, phone, role, status) 
+VALUES ('admin_user', 'admin@vehicare.com', '$2y$10$IN8g1ooEgn6zup7MdNH0zezcBX2xx6GmZkEb58ifoFqY8/n/U05Pu', 'VehiCare Administrator', '+1-555-0100', 'admin', 'active');
+
+-- Insert Staff Account
+-- Email: staff@vehicare.com
+-- Password: VehiCare@2026Staff (stored as bcrypt hash)
+INSERT INTO users (username, email, password, full_name, phone, role, status) 
+VALUES ('staff_user', 'staff@vehicare.com', '$2y$10$hkqgpmntm6V.EDUGg3cGCuzEQDVp2ykEKCM7N3sJX2Qu3aEPiZIRS', 'VehiCare Staff Member', '+1-555-0200', 'staff', 'active');
+
+-- --------------------------------------------------------
+-- Monitoring Queries: Users (copied from USERS_MONITORING_QUERIES.sql)
+-- --------------------------------------------------------
+
+-- VIEW ALL USERS
+SELECT 
+    user_id, 
+    username, 
+    email, 
+    full_name, 
+    phone, 
+    role, 
+    status, 
+    created_date, 
+    updated_date, 
+    last_login
+FROM users
+ORDER BY created_date DESC;
+
+-- USER STATISTICS
+-- Count users by role
+SELECT 
+    role, 
+    COUNT(*) as count,
+    ROUND((COUNT(*) / (SELECT COUNT(*) FROM users) * 100), 2) as percentage
+FROM users
+GROUP BY role
+ORDER BY count DESC;
+
+-- Count users by status
+SELECT 
+    status, 
+    COUNT(*) as count
+FROM users
+GROUP BY status;
+
+-- Total active users
+SELECT COUNT(*) as total_active_users
+FROM users
+WHERE status = 'active';
+
+-- ADMIN ACCOUNTS MONITORING
+SELECT 
+    user_id, 
+    username, 
+    email, 
+    full_name, 
+    created_date, 
+    last_login
+FROM users
+WHERE role = 'admin'
+ORDER BY created_date DESC;
+
+-- STAFF ACCOUNTS MONITORING
+SELECT 
+    user_id, 
+    username, 
+    email, 
+    full_name, 
+    phone, 
+    status, 
+    created_date, 
+    last_login
+FROM users
+WHERE role = 'staff'
+ORDER BY created_date DESC;
+
+-- CLIENT ACCOUNTS MONITORING
+SELECT 
+    user_id, 
+    username, 
+    email, 
+    full_name, 
+    phone, 
+    status, 
+    created_date, 
+    last_login
+FROM users
+WHERE role = 'client'
+ORDER BY created_date DESC;
+
+-- ACTIVITY MONITORING: Users who logged in today
+SELECT 
+    user_id, 
+    username, 
+    email, 
+    role, 
+    last_login
+FROM users
+WHERE DATE(last_login) = CURDATE()
+ORDER BY last_login DESC;
+
+-- Users who haven't logged in for 30 days
+SELECT 
+    user_id, 
+    username, 
+    email, 
+    role, 
+    status, 
+    last_login
+FROM users
+WHERE last_login < DATE_SUB(NOW(), INTERVAL 30 DAY) OR last_login IS NULL
+ORDER BY last_login ASC;
+
+-- DUPLICATE CHECK: duplicate emails
+SELECT 
+    email, 
+    COUNT(*) as count
+FROM users
+GROUP BY email
+HAVING COUNT(*) > 1;
+
+-- ACCOUNT MANAGEMENT EXAMPLES
+-- Activate a user (replace user_id with actual ID)
+UPDATE users
+SET status = 'active'
+WHERE user_id = 1;
+
+-- Deactivate a user
+UPDATE users
+SET status = 'inactive'
+WHERE user_id = 1;
+
+-- Suspend a user
+UPDATE users
+SET status = 'suspended'
+WHERE user_id = 1;
+
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

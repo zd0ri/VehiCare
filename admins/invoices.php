@@ -7,15 +7,22 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
     exit;
 }
 
-// Fetch all clients
-$clientsQuery = $conn->query("SELECT * FROM users WHERE role = 'client' ORDER BY full_name");
+// Get all invoices
+$invoices = $conn->query("
+    SELECT i.*, u.full_name, s.service_name, a.appointment_date, a.client_id
+    FROM invoices i
+    LEFT JOIN appointments a ON i.appointment_id = a.appointment_id
+    LEFT JOIN users u ON a.client_id = u.user_id
+    LEFT JOIN services s ON a.service_id = s.service_id
+    ORDER BY i.invoice_date DESC
+");
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Clients - VehiCare Admin</title>
+    <title>Invoices & Billing - VehiCare Admin</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
@@ -74,9 +81,6 @@ $clientsQuery = $conn->query("SELECT * FROM users WHERE role = 'client' ORDER BY
             border-radius: 8px;
             margin-bottom: 30px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
         }
         
         .page-header h1 {
@@ -100,21 +104,6 @@ $clientsQuery = $conn->query("SELECT * FROM users WHERE role = 'client' ORDER BY
         .data-table tbody tr:hover {
             background: #f8f9fa;
         }
-        
-        .modal-header {
-            background: linear-gradient(135deg, var(--teal-dark) 0%, var(--teal-color) 100%);
-            color: #fff;
-        }
-        
-        .btn-primary {
-            background: linear-gradient(135deg, var(--teal-dark) 0%, var(--teal-color) 100%);
-            border: none;
-        }
-        
-        .btn-primary:hover {
-            background: var(--teal-dark);
-            color: #fff;
-        }
     </style>
 </head>
 <body>
@@ -127,15 +116,15 @@ $clientsQuery = $conn->query("SELECT * FROM users WHERE role = 'client' ORDER BY
         
         <a href="/vehicare_db/admins/index.php"><i class="fas fa-dashboard"></i>Dashboard</a>
         <a href="/vehicare_db/admins/appointments.php"><i class="fas fa-calendar"></i>Appointments</a>
-        <a href="/vehicare_db/admins/walk_in_booking.php"><i class="fas fa-door-open"></i>Walk-In Bookings</a>
-        <a href="/vehicare_db/admins/clients.php" class="active"><i class="fas fa-users"></i>Clients</a>
+        <a href="/vehicare_db/admins/walk_in_booking.php"><i class="fas fa-door-open"></i>Walk-In</a>
+        <a href="/vehicare_db/admins/clients.php"><i class="fas fa-users"></i>Clients</a>
         <a href="/vehicare_db/admins/vehicles.php"><i class="fas fa-car"></i>Vehicles</a>
         <a href="/vehicare_db/admins/technicians.php"><i class="fas fa-tools"></i>Technicians</a>
         <a href="/vehicare_db/admins/assignments.php"><i class="fas fa-tasks"></i>Assignments</a>
         <a href="/vehicare_db/admins/queue.php"><i class="fas fa-list-ol"></i>Queue</a>
         <a href="/vehicare_db/admins/inventory.php"><i class="fas fa-boxes"></i>Inventory</a>
         <a href="/vehicare_db/admins/payments.php"><i class="fas fa-credit-card"></i>Payments</a>
-        <a href="/vehicare_db/admins/invoices.php"><i class="fas fa-receipt"></i>Invoices</a>
+        <a href="/vehicare_db/admins/invoices.php" class="active"><i class="fas fa-receipt"></i>Invoices</a>
         <a href="/vehicare_db/admins/ratings.php"><i class="fas fa-star"></i>Ratings</a>
         <a href="/vehicare_db/admins/notifications.php"><i class="fas fa-bell"></i>Notifications</a>
         <a href="/vehicare_db/admins/audit_logs.php"><i class="fas fa-history"></i>Audit Logs</a>
@@ -144,42 +133,49 @@ $clientsQuery = $conn->query("SELECT * FROM users WHERE role = 'client' ORDER BY
     
     <main class="main-content">
         <div class="page-header">
-            <h1>Manage Clients</h1>
-            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addModal">
-                <i class="fas fa-plus"></i> Add New Client
-            </button>
+            <h1>Invoices & Billing</h1>
         </div>
         
         <div class="data-table">
             <table class="table table-hover mb-0">
                 <thead>
                     <tr>
-                        <th>ID</th>
-                        <th>Full Name</th>
-                        <th>Phone</th>
-                        <th>Email</th>
-                        <th>Address</th>
+                        <th>Invoice ID</th>
+                        <th>Client</th>
+                        <th>Service</th>
+                        <th>Appointment Date</th>
+                        <th>Labor Cost</th>
+                        <th>Parts Cost</th>
+                        <th>Total</th>
+                        <th>Status</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <?php if ($clientsQuery && $clientsQuery->num_rows > 0): ?>
-                        <?php while ($client = $clientsQuery->fetch_assoc()): ?>
+                    <?php if ($invoices && $invoices->num_rows > 0): ?>
+                        <?php while ($invoice = $invoices->fetch_assoc()): ?>
                         <tr>
-                            <td><strong>#<?php echo $client['user_id']; ?></strong></td>
-                            <td><?php echo htmlspecialchars($client['full_name']); ?></td>
-                            <td><?php echo htmlspecialchars($client['phone'] ?? 'N/A'); ?></td>
-                            <td><?php echo htmlspecialchars($client['email']); ?></td>
-                            <td><?php echo htmlspecialchars($client['address'] ?? 'N/A'); ?></td>
+                            <td><strong>#<?php echo $invoice['invoice_id']; ?></strong></td>
+                            <td><?php echo htmlspecialchars($invoice['full_name'] ?? 'N/A'); ?></td>
+                            <td><?php echo htmlspecialchars($invoice['service_name'] ?? 'N/A'); ?></td>
+                            <td><?php echo date('M d, Y', strtotime($invoice['appointment_date'] ?? now())); ?></td>
+                            <td>₱<?php echo number_format($invoice['total_labor'] ?? 0, 2); ?></td>
+                            <td>₱<?php echo number_format($invoice['total_parts'] ?? 0, 2); ?></td>
+                            <td><strong>₱<?php echo number_format($invoice['grand_total'] ?? 0, 2); ?></strong></td>
                             <td>
-                                <button class="btn btn-sm btn-warning"><i class="fas fa-edit"></i></button>
-                                <button class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></button>
+                                <span class="badge bg-<?php echo ($invoice['payment_status'] ?? 'unpaid') == 'paid' ? 'success' : 'warning'; ?>">
+                                    <?php echo ucfirst($invoice['payment_status'] ?? 'unpaid'); ?>
+                                </span>
+                            </td>
+                            <td>
+                                <button class="btn btn-sm btn-primary"><i class="fas fa-print"></i> Print</button>
+                                <button class="btn btn-sm btn-info"><i class="fas fa-eye"></i> View</button>
                             </td>
                         </tr>
                         <?php endwhile; ?>
                     <?php else: ?>
                         <tr>
-                            <td colspan="6" class="text-center py-4 text-muted">No clients found</td>
+                            <td colspan="9" class="text-center py-4 text-muted">No invoices found</td>
                         </tr>
                     <?php endif; ?>
                 </tbody>

@@ -4,6 +4,10 @@
   --primary-color: #d4794a;
   --secondary-color: #e8934b;
   --accent-color: #2c5aa0;
+  --teal-color: #0ea5a4;
+  --teal-dark: #0b7f7f;
+  --hero-dark: #074f4f;
+  --hero-text-light: #f8fafc;
   --success-color: #27ae60;
   --warning-color: #f39c12;
   --danger-color: #e74c3c;
@@ -28,8 +32,8 @@ body {
 
 /* Hero Section */
 .hero {
-  background: linear-gradient(135deg, #d4794a 0%, #e8934b 100%);
-  color: #fff;
+  background: linear-gradient(135deg, var(--teal-dark) 0%, var(--hero-dark) 100%);
+  color: var(--hero-text-light);
   padding: 80px 20px;
   min-height: 600px;
   display: flex;
@@ -53,12 +57,13 @@ body {
   font-weight: 700;
   margin-bottom: 15px;
   line-height: 1.2;
+  color: var(--hero-text-light);
 }
 
 .hero p {
   font-size: 1.2rem;
   margin-bottom: 30px;
-  opacity: 0.95;
+  color: rgba(248,250,252,0.92);
 }
 
 .hero-cta {
@@ -69,6 +74,128 @@ body {
 
 .hero-media {
   text-align: center;
+}
+
+.hero .highlight-text {
+  color: var(--secondary-color);
+  font-weight: 800;
+}
+
+/* Hero CTAs */
+.hero .btn-dark {
+  background: rgba(255,255,255,0.08);
+  color: #fff;
+  border: 1px solid rgba(255,255,255,0.12);
+}
+
+.hero .btn-dark:hover {
+  background: rgba(255,255,255,0.12);
+  transform: translateY(-2px);
+}
+
+.hero .btn-outline-primary {
+  border: 2px solid rgba(255,255,255,0.9);
+  color: #fff;
+}
+
+.hero .btn-outline-primary:hover {
+  background: #fff;
+  color: var(--primary-color);
+}
+
+/* Hero media card */
+.hero-media .hero-icon-wrap {
+  background: #fff;
+  padding: 40px;
+  border-radius: 10px;
+  display: inline-block;
+  box-shadow: 0 12px 36px rgba(7, 63, 63, 0.12);
+}
+
+.hero-media .hero-icon {
+  font-size: 150px;
+  color: var(--primary-color);
+  line-height: 1;
+} 
+
+/* Navbar header overrides (default: light header with black text) */
+.navbar {
+  background: #fff !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.navbar .navbar-brand,
+.navbar .nav-link,
+.navbar .d-flex .btn,
+.navbar .btn {
+  color: #111 !important;
+}
+
+.navbar .navbar-brand .fa-car {
+  color: var(--primary-color);
+  margin-right: 8px;
+}
+
+/* Dark navbar helper class (use when you want a dark header)
+   Add class 'dark' to <nav class="navbar"> to keep the previous dark style */
+.navbar.dark {
+  background: linear-gradient(135deg, var(--teal-color) 0%, var(--teal-dark) 100%) !important;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+}
+
+.navbar.dark .navbar-brand,
+.navbar.dark .nav-link,
+.navbar.dark .d-flex .btn,
+.navbar.dark .btn {
+  color: #fff !important;
+}
+
+.navbar.dark .navbar-brand .fa-car {
+  color: #fff;
+}
+
+.navbar.dark .navbar-toggler {
+  border-color: rgba(255,255,255,0.12);
+}
+
+.navbar.dark .navbar-toggler-icon {
+  filter: invert(1) brightness(2);
+}
+
+/* Navbar toggler contrast */
+.navbar .navbar-toggler {
+  border-color: rgba(0,0,0,0.08);
+}
+
+.navbar .navbar-toggler-icon {
+  filter: none;
+}
+
+/* Hero icon styles */
+.hero-media .hero-icon-wrap {
+  background: #fff;
+  padding: 40px;
+  border-radius: 10px;
+  display: inline-block;
+  box-shadow: 0 8px 28px rgba(40, 40, 60, 0.08);
+}
+
+.hero-media .hero-icon {
+  font-size: 150px;
+  color: var(--primary-color);
+  line-height: 1;
+}
+
+/* Hero text colors and emphasis for dark hero */
+.hero h1,
+.hero p {
+  color: var(--hero-text-light);
+  text-shadow: 0 2px 16px rgba(2,10,10,0.2);
+}
+
+.hero .highlight-text {
+  color: var(--secondary-color);
+  font-weight: 800;
 }
 
 .hero-media img {

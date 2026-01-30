@@ -3,105 +3,199 @@ session_start();
 require_once __DIR__ . '/../includes/config.php';
 
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
-    header("Location: /vehicare_db/index.php");
+    header("Location: /vehicare_db/login.php");
     exit;
 }
 
-include __DIR__ . '/../includes/adminHeader.php';
-
-// Fetch payments/invoices
+// Fetch payments
 $paymentsQuery = $conn->query("
-  SELECT i.*, a.appointment_id, c.full_name
-  FROM invoices i
-  LEFT JOIN appointments a ON i.appointment_id = a.appointment_id
-  LEFT JOIN clients c ON a.client_id = c.client_id
-  ORDER BY i.invoice_date DESC
+  SELECT p.*, a.appointment_id, u.full_name, s.service_name
+  FROM payments p
+  LEFT JOIN appointments a ON p.appointment_id = a.appointment_id
+  LEFT JOIN users u ON p.client_id = u.user_id
+  LEFT JOIN services s ON a.service_id = s.service_id
+  ORDER BY p.payment_date DESC
 ");
 ?>
-
-<div class="admin-sidebar-shared">
-  <div class="list-group">
-    <a href="/vehicare_db/admins/dashboard.php" class="list-group-item">
-      <i class="fas fa-chart-line"></i> Dashboard
-    </a>
-    <a href="/vehicare_db/admins/payments.php" class="list-group-item active">
-      <i class="fas fa-money-bill"></i> Payments
-    </a>
-  </div>
-</div>
-
-<div class="admin-main-content">
-  <h1 style="color: #1a3a52; margin-bottom: 20px;">Manage Payments & Invoices</h1>
-  
-  <div class="dashboard-stats" style="margin-bottom: 30px;">
-    <div class="stat-card">
-      <div class="stat-icon"><i class="fas fa-money-bill"></i></div>
-      <div class="stat-label">Total Revenue</div>
-      <div class="stat-value">
-        $<?php
-        $revenueResult = $conn->query("SELECT SUM(grand_total) as total FROM invoices")->fetch_assoc();
-        echo number_format($revenueResult['total'] ?? 0, 2);
-        ?>
-      </div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-icon"><i class="fas fa-receipt"></i></div>
-      <div class="stat-label">Total Invoices</div>
-      <div class="stat-value">
-        <?php
-        $invoiceCount = $conn->query("SELECT COUNT(*) as count FROM invoices")->fetch_assoc();
-        echo $invoiceCount['count'];
-        ?>
-      </div>
-    </div>
-  </div>
-
-  <div class="table-container">
-    <div class="table-header">
-      <h3>All Invoices</h3>
-    </div>
-    <div style="overflow-x: auto;">
-      <table class="table">
-        <thead>
-          <tr>
-            <th>Invoice ID</th>
-            <th>Client</th>
-            <th>Appointment</th>
-            <th>Labor</th>
-            <th>Parts</th>
-            <th>Total</th>
-            <th>Date</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          <?php
-          if ($paymentsQuery && $paymentsQuery->num_rows > 0) {
-            while ($invoice = $paymentsQuery->fetch_assoc()) {
-              echo "<tr>
-                <td>#{$invoice['invoice_id']}</td>
-                <td>{$invoice['full_name']}</td>
-                <td>#{$invoice['appointment_id']}</td>
-                <td>\${$invoice['total_labor']}</td>
-                <td>\${$invoice['total_parts']}</td>
-                <td><strong>\${$invoice['grand_total']}</strong></td>
-                <td>" . date('M d, Y', strtotime($invoice['invoice_date'])) . "</td>
-                <td>
-                  <div class='action-buttons'>
-                    <button class='btn btn-primary btn-sm'>View</button>
-                  </div>
-                </td>
-              </tr>";
-            }
-          } else {
-            echo "<tr><td colspan='8' style='text-align: center; padding: 20px;'>No invoices found</td></tr>";
-          }
-          ?>
-        </tbody>
-      </table>
-    </div>
-  </div>
-
-</div>
-
-<?php include __DIR__ . '/../includes/footer.php'; ?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payments - VehiCare Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --teal-color: #0ea5a4;
+            --teal-dark: #0b7f7f;
+            --primary: #d4794a;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #f5f7fa;
+        }
+        
+        .sidebar {
+            width: 280px;
+            background: linear-gradient(135deg, var(--teal-dark) 0%, var(--teal-color) 100%);
+            color: #fff;
+            padding: 20px 0;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+        }
+        
+        .sidebar a {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            transition: all 0.3s;
+            border-left: 3px solid transparent;
+        }
+        
+        .sidebar a:hover, .sidebar a.active {
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+            border-left-color: var(--primary);
+        }
+        
+        .sidebar i {
+            width: 24px;
+            margin-right: 12px;
+        }
+        
+        .main-content {
+            margin-left: 280px;
+            padding: 30px;
+            width: calc(100% - 280px);
+        }
+        
+        .page-header {
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .page-header h1 {
+            margin: 0;
+            color: var(--teal-dark);
+            font-weight: 700;
+        }
+        
+        .data-table {
+            background: #fff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+        
+        .data-table thead {
+            background: linear-gradient(135deg, var(--teal-dark) 0%, var(--teal-color) 100%);
+            color: #fff;
+        }
+        
+        .data-table tbody tr:hover {
+            background: #f8f9fa;
+        }
+        
+        .modal-header {
+            background: linear-gradient(135deg, var(--teal-dark) 0%, var(--teal-color) 100%);
+            color: #fff;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--teal-dark) 0%, var(--teal-color) 100%);
+            border: none;
+        }
+        
+        .btn-primary:hover {
+            background: var(--teal-dark);
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div style="padding: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 20px;">
+            <h3 style="margin: 0;"><i class="fas fa-car me-2"></i>VehiCare</h3>
+            <small>Admin Panel</small>
+        </div>
+        
+        <a href="/vehicare_db/admins/index.php"><i class="fas fa-dashboard"></i>Dashboard</a>
+        <a href="/vehicare_db/admins/appointments.php"><i class="fas fa-calendar"></i>Appointments</a>
+        <a href="/vehicare_db/admins/walk_in_booking.php"><i class="fas fa-door-open"></i>Walk-In Bookings</a>
+        <a href="/vehicare_db/admins/clients.php"><i class="fas fa-users"></i>Clients</a>
+        <a href="/vehicare_db/admins/vehicles.php"><i class="fas fa-car"></i>Vehicles</a>
+        <a href="/vehicare_db/admins/technicians.php"><i class="fas fa-tools"></i>Technicians</a>
+        <a href="/vehicare_db/admins/assignments.php"><i class="fas fa-tasks"></i>Assignments</a>
+        <a href="/vehicare_db/admins/queue.php"><i class="fas fa-list-ol"></i>Queue</a>
+        <a href="/vehicare_db/admins/inventory.php"><i class="fas fa-boxes"></i>Inventory</a>
+        <a href="/vehicare_db/admins/payments.php" class="active"><i class="fas fa-credit-card"></i>Payments</a>
+        <a href="/vehicare_db/admins/invoices.php"><i class="fas fa-receipt"></i>Invoices</a>
+        <a href="/vehicare_db/admins/ratings.php"><i class="fas fa-star"></i>Ratings</a>
+        <a href="/vehicare_db/admins/notifications.php"><i class="fas fa-bell"></i>Notifications</a>
+        <a href="/vehicare_db/admins/audit_logs.php"><i class="fas fa-history"></i>Audit Logs</a>
+        <a href="/vehicare_db/logout.php" style="border-top: 1px solid rgba(255,255,255,0.1); margin-top: 20px; padding-top: 20px;"><i class="fas fa-sign-out-alt"></i>Logout</a>
+    </aside>
+    
+    <main class="main-content">
+        <div class="page-header">
+            <h1>Payment Tracking</h1>
+        </div>
+        
+        <div class="data-table">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>Payment ID</th>
+                        <th>Client</th>
+                        <th>Service</th>
+                        <th>Amount</th>
+                        <th>Method</th>
+                        <th>Date</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php if ($paymentsQuery && $paymentsQuery->num_rows > 0): ?>
+                        <?php while ($payment = $paymentsQuery->fetch_assoc()): ?>
+                        <tr>
+                            <td><strong>#<?php echo $payment['payment_id']; ?></strong></td>
+                            <td><?php echo htmlspecialchars($payment['full_name'] ?? 'N/A'); ?></td>
+                            <td><?php echo htmlspecialchars($payment['service_name'] ?? 'N/A'); ?></td>
+                            <td><strong>$<?php echo number_format($payment['amount'], 2); ?></strong></td>
+                            <td><?php echo htmlspecialchars($payment['payment_method'] ?? 'N/A'); ?></td>
+                            <td><?php echo date('M d, Y', strtotime($payment['payment_date'])); ?></td>
+                            <td>
+                                <span class="badge bg-success">Completed</span>
+                            </td>
+                            <td>
+                                <button class="btn btn-sm btn-warning"><i class="fas fa-edit"></i></button>
+                            </td>
+                        </tr>
+                        <?php endwhile; ?>
+                    <?php else: ?>
+                        <tr>
+                            <td colspan="8" class="text-center py-4 text-muted">No payments found</td>
+                        </tr>
+                    <?php endif; ?>
+                </tbody>
+            </table>
+        </div>
+    </main>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

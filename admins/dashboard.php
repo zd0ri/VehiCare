@@ -4,9 +4,13 @@ require_once __DIR__ . '/../includes/config.php';
 
 // Check if admin is logged in
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
-    header("Location: /vehicare_db/index.php");
+    header("Location: /vehicare_db/login.php");
     exit;
 }
+
+// Redirect to new dashboard
+header("Location: /vehicare_db/admins/index.php");
+exit;
 
 // Get statistics
 $clientCount = $conn->query("SELECT COUNT(*) as count FROM clients")->fetch_assoc()['count'];

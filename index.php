@@ -20,8 +20,8 @@ include __DIR__ . '/includes/header.php';
       </div>
     </div>
     <div class="hero-media">
-      <div style="background: linear-gradient(135deg, rgba(45, 90, 123, 0.2) 0%, rgba(232, 245, 255, 0.2) 100%); padding: 40px; border-radius: 10px; text-align: center;">
-        <i class="fas fa-car" style="font-size: 150px; color: rgba(255, 255, 255, 0.5);"></i>
+      <div class="hero-icon-wrap">
+        <i class="fas fa-car hero-icon"></i>
       </div>
     </div>
   </div>
