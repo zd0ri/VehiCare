@@ -132,6 +132,7 @@ body.admin-mode .navbar .btn-outline-danger:hover {
 body.admin-mode {
   background: var(--admin-bg);
   color: var(--admin-text);
+  font-family: 'Poppins', sans-serif;
 }
 
 /* Admin cards & containers */

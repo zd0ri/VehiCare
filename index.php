@@ -4,223 +4,430 @@ require_once __DIR__ . '/includes/config.php';
 include __DIR__ . '/includes/header.php';
 ?>
 
-<!-- VehiCare Homepage -->
+<style>
+    * {
+        font-family: 'Poppins', sans-serif;
+    }
 
-<?php include_once __DIR__ . '/includes/alert.php'; ?>
+    html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        background: #f8f9fa;
+    }
 
-<!-- Hero Section -->
-<section class="hero">
-  <div class="hero-inner">
-    <div>
-      <h1>Your Vehicle <span class="highlight-text">Deserves</span> Expert Care</h1>
-      <p>Professional vehicle maintenance and repair services. Trust VehiCare with your automotive needs.</p>
-      <div class="hero-cta">
-        <a href="#services" class="btn btn-dark btn-lg">Explore Services</a>
-        <a href="#appointment" class="btn btn-outline-primary btn-lg">Book Now</a>
-      </div>
-    </div>
-    <div class="hero-media">
-      <div class="hero-icon-wrap">
-        <i class="fas fa-car hero-icon"></i>
-      </div>
-    </div>
-  </div>
-</section>
+    body {
+        font-family: 'Poppins', sans-serif;
+        display: flex;
+        flex-direction: column;
+    }
 
-<!-- Featured Services Section -->
-<section class="featured-services" id="services">
-  <div class="container">
-    <h2 class="section-title">Our Services</h2>
-    <div class="services-grid">
-      <div class="service-card">
-        <i class="fas fa-cogs"></i>
-        <h3>Regular Maintenance</h3>
-        <p>Keep your vehicle running smoothly with our comprehensive maintenance services including oil changes, filter replacements, and inspections.</p>
-      </div>
-      <div class="service-card">
-        <i class="fas fa-tools"></i>
-        <h3>Engine Repair</h3>
-        <p>Expert engine diagnostics and repair services. We handle everything from minor tune-ups to major engine overhauls.</p>
-      </div>
-      <div class="service-card">
-        <i class="fas fa-brake"></i>
-        <h3>Brake Service</h3>
-        <p>Safety is our priority. Professional brake inspection, repair, and replacement to ensure your vehicle stops safely.</p>
-      </div>
-      <div class="service-card">
-        <i class="fas fa-oil-can"></i>
-        <h3>Fluid Services</h3>
-        <p>Complete fluid management including oil changes, coolant flushes, transmission fluid, and brake fluid services.</p>
-      </div>
-      <div class="service-card">
-        <i class="fas fa-car"></i>
-        <h3>Tire Services</h3>
-        <p>Professional tire sales, installation, balancing, and rotation. Keep your tires in perfect condition.</p>
-      </div>
-      <div class="service-card">
-        <i class="fas fa-battery-half"></i>
-        <h3>Battery & Electrical</h3>
-        <p>Battery testing, replacement, and electrical system diagnostics. We ensure your vehicle starts every time.</p>
-      </div>
-    </div>
-  </div>
-</section>
+    nav {
+        flex-shrink: 0;
+    }
 
-<!-- Why Choose Us -->
-<section class="why-choose-us" id="about">
-  <div class="container">
-    <h2 class="section-title">Why Choose VehiCare?</h2>
-    <div class="features-grid">
-      <div class="feature-item">
-        <i class="fas fa-star"></i>
-        <h3>Expert Technicians</h3>
-        <p>Our certified technicians bring years of experience and expertise to every service.</p>
-      </div>
-      <div class="feature-item">
-        <i class="fas fa-check-circle"></i>
-        <h3>Quality Guarantee</h3>
-        <p>We stand behind our work with comprehensive warranties on all services and parts.</p>
-      </div>
-      <div class="feature-item">
-        <i class="fas fa-clock"></i>
-        <h3>Fast Service</h3>
-        <p>Quick turnaround times without compromising on quality. Get back on the road faster.</p>
-      </div>
-      <div class="feature-item">
-        <i class="fas fa-wallet"></i>
-        <h3>Affordable Pricing</h3>
-        <p>Competitive rates with transparent pricing. No hidden fees or surprise charges.</p>
-      </div>
-      <div class="feature-item">
-        <i class="fas fa-tools"></i>
-        <h3>Modern Equipment</h3>
-        <p>State-of-the-art diagnostic and repair equipment for accurate service delivery.</p>
-      </div>
-      <div class="feature-item">
-        <i class="fas fa-headset"></i>
-        <h3>Customer Support</h3>
-        <p>Dedicated support team ready to answer questions and assist you anytime.</p>
-      </div>
-    </div>
-  </div>
-</section>
+    .hero-modern {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #ffffff 0%, #f5f7fa 100%);
+        padding: 60px 40px;
+        overflow: hidden;
+    }
 
-<!-- Appointment Section -->
-<section class="appointments-section" id="appointment">
-  <div class="appointment-form">
-    <h2>Book Your Service</h2>
-    <form method="POST" action="/vehicare_db/admins/process_appointment.php">
-      <div class="form-group">
-        <label for="name">Full Name *</label>
-        <input type="text" id="name" name="full_name" required>
-      </div>
-      <div class="form-group">
-        <label for="phone">Phone Number *</label>
-        <input type="tel" id="phone" name="phone" required>
-      </div>
-      <div class="form-group">
-        <label for="email">Email Address *</label>
-        <input type="email" id="email" name="email" required>
-      </div>
-      <div class="form-group">
-        <label for="vehicle">Vehicle Model *</label>
-        <input type="text" id="vehicle" name="vehicle_model" placeholder="e.g., Toyota Camry 2020" required>
-      </div>
-      <div class="form-group">
-        <label for="service">Select Service *</label>
-        <select id="service" name="service_id" required>
-          <option value="">Choose a service</option>
-          <?php
-          $serviceResult = $conn->query("SELECT * FROM services");
-          if ($serviceResult) {
-            while ($service = $serviceResult->fetch_assoc()) {
-              echo "<option value='{$service['service_id']}'>{$service['service_name']} - \${$service['price']}</option>";
-            }
-          }
-          ?>
-        </select>
-      </div>
-      <div class="form-group">
-        <label for="date">Preferred Date *</label>
-        <input type="date" id="date" name="appointment_date" required>
-      </div>
-      <div class="form-group">
-        <label for="time">Preferred Time *</label>
-        <input type="time" id="time" name="appointment_time" required>
-      </div>
-      <div class="form-group">
-        <label for="notes">Additional Notes</label>
-        <textarea id="notes" name="notes" placeholder="Tell us about your vehicle's issues or special requests..."></textarea>
-      </div>
-      <button type="submit" class="btn btn-dark btn-lg" style="width: 100%; margin-top: 10px;">Book Appointment</button>
-    </form>
-  </div>
-</section>
+    .hero-container {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 80px;
+        max-width: 1600px;
+        width: 100%;
+        align-items: center;
+    }
 
-<!-- Testimonials Section -->
-<section class="testimonials-section">
-  <div class="container">
-    <h2>What Our Customers Say</h2>
-    <div class="testimonials-grid">
-      <div class="testimonial-card">
-        <div class="stars">
-          <i class="fas fa-star"></i>
-          <i class="fas fa-star"></i>
-          <i class="fas fa-star"></i>
-          <i class="fas fa-star"></i>
-          <i class="fas fa-star"></i>
+    .hero-content h1 {
+        font-size: 3.8em;
+        font-weight: 700;
+        line-height: 1.15;
+        margin: 0 0 25px 0;
+        color: #1a1a1a;
+        letter-spacing: -1px;
+    }
+
+    .hero-content h1 .highlight {
+        font-style: italic;
+        color: #0066cc;
+        font-weight: 700;
+    }
+
+    .hero-content > p {
+        font-size: 1.15em;
+        color: #666;
+        margin: 0 0 50px 0;
+        line-height: 1.6;
+        font-weight: 400;
+    }
+
+    .search-filters {
+        background: white;
+        padding: 20px 30px;
+        border-radius: 50px;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr) 130px;
+        gap: 20px;
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+        margin-bottom: 30px;
+        align-items: flex-end;
+    }
+
+    .search-filters .filter-group {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .search-filters label {
+        font-size: 0.85em;
+        color: #666;
+        font-weight: 600;
+        margin-bottom: 8px;
+        text-transform: capitalize;
+    }
+
+    .search-filters select,
+    .search-filters input {
+        padding: 10px 15px;
+        border: none;
+        background: transparent;
+        border-bottom: 1px solid #e0e0e0;
+        font-size: 0.95em;
+        font-family: 'Poppins', sans-serif;
+        color: #333;
+    }
+
+    .search-filters select:focus,
+    .search-filters input:focus {
+        outline: none;
+        border-bottom-color: #0066cc;
+        background: transparent;
+    }
+
+    .search-filters select {
+        appearance: none;
+        background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+        background-repeat: no-repeat;
+        background-position: right 0 center;
+        background-size: 20px;
+        padding-right: 25px;
+    }
+
+    .btn-book {
+        background: #0066cc;
+        color: white;
+        border: none;
+        padding: 12px 30px;
+        border-radius: 50px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-size: 0.95em;
+        box-shadow: 0 4px 15px rgba(0, 102, 204, 0.3);
+    }
+
+    .btn-book:hover {
+        background: #0052a3;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 25px rgba(0, 102, 204, 0.4);
+    }
+
+    .cta-buttons {
+        display: flex;
+        gap: 15px;
+        margin-top: 10px;
+    }
+
+    .cta-buttons a {
+        padding: 10px 25px;
+        border-radius: 50px;
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        font-size: 0.95em;
+    }
+
+    .btn-primary-cta {
+        background: #0066cc;
+        color: white;
+        box-shadow: 0 4px 15px rgba(0, 102, 204, 0.3);
+    }
+
+    .btn-primary-cta:hover {
+        background: #0052a3;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 25px rgba(0, 102, 204, 0.4);
+    }
+
+    .btn-secondary-cta {
+        background: transparent;
+        color: #1a1a1a;
+        border: 2px solid #1a1a1a;
+    }
+
+    .btn-secondary-cta:hover {
+        background: #1a1a1a;
+        color: white;
+    }
+
+    .hero-image {
+        position: relative;
+        height: 500px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .hero-image img {
+        height: 100%;
+        object-fit: contain;
+        filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.1));
+    }
+
+    .car-specs {
+        position: absolute;
+        bottom: 30px;
+        right: 20px;
+        background: white;
+        padding: 25px;
+        border-radius: 20px;
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+        width: 300px;
+    }
+
+    .car-specs-header {
+        display: flex;
+        gap: 15px;
+        margin-bottom: 20px;
+    }
+
+    .car-specs-header img {
+        width: 80px;
+        height: 80px;
+        border-radius: 12px;
+        object-fit: cover;
+    }
+
+    .car-specs-info h4 {
+        margin: 0;
+        font-size: 1em;
+        color: #1a1a1a;
+        font-weight: 600;
+    }
+
+    .car-specs-info p {
+        margin: 3px 0;
+        font-size: 0.85em;
+        color: #999;
+    }
+
+    .spec-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 20px;
+        padding: 20px 0;
+        border-top: 1px solid #f0f0f0;
+    }
+
+    .spec-row:first-of-type {
+        border-top: none;
+        padding-top: 0;
+    }
+
+    .spec-item {
+        text-align: center;
+    }
+
+    .spec-item .value {
+        display: block;
+        font-size: 1.2em;
+        font-weight: 700;
+        color: #1a1a1a;
+    }
+
+    .spec-item .label {
+        display: block;
+        font-size: 0.7em;
+        color: #999;
+        text-transform: uppercase;
+        margin-top: 4px;
+        font-weight: 600;
+    }
+
+    .specs-footer {
+        text-align: right;
+        margin-top: 15px;
+        padding-top: 15px;
+        border-top: 1px solid #f0f0f0;
+    }
+
+    .specs-footer a {
+        color: #0066cc;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 0.9em;
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .specs-footer a:hover {
+        color: #0052a3;
+    }
+
+    @media (max-width: 1024px) {
+        .hero-container {
+            grid-template-columns: 1fr;
+            gap: 40px;
+        }
+
+        .hero-content h1 {
+            font-size: 2.8em;
+        }
+
+        .hero-image {
+            height: 350px;
+        }
+
+        .search-filters {
+            grid-template-columns: 1fr;
+        }
+
+        .car-specs {
+            position: static;
+            width: 100%;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .hero-modern {
+            padding: 40px 20px;
+        }
+
+        .hero-content h1 {
+            font-size: 2em;
+        }
+
+        .search-filters {
+            padding: 20px;
+            gap: 15px;
+        }
+
+        .search-filters .filter-group {
+            margin-bottom: 10px;
+        }
+
+        .cta-buttons {
+            flex-direction: column;
+        }
+
+        .cta-buttons a {
+            width: 100%;
+            text-align: center;
+        }
+
+        .car-specs {
+            margin-top: 20px;
+        }
+    }
+</style>
+
+<!-- Hero Section Modern -->
+<section class="hero-modern">
+    <div class="hero-container">
+        <!-- Left Content -->
+        <div class="hero-content">
+            <h1>Drive the <span class="highlight">Experience</span><br>You Deserve.</h1>
+            <p>Professional vehicle maintenance and repair services. Easy booking, no hidden fees.</p>
+            
+            <!-- Search & Filters -->
+            <form method="POST" action="/vehicare_db/appointment.php" class="search-filters">
+                <div class="filter-group">
+                    <label>Service Type</label>
+                    <select name="service_type" required>
+                        <option value="">Select Service</option>
+                        <?php
+                        $serviceResult = $conn->query("SELECT service_id, service_name FROM services LIMIT 8");
+                        if ($serviceResult) {
+                            while ($service = $serviceResult->fetch_assoc()) {
+                                echo "<option value='{$service['service_id']}'>{$service['service_name']}</option>";
+                            }
+                        }
+                        ?>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Vehicle Type</label>
+                    <select name="vehicle_type">
+                        <option value="">All Vehicles</option>
+                        <option value="sedan">Sedan</option>
+                        <option value="suv">SUV</option>
+                        <option value="truck">Truck</option>
+                        <option value="van">Van</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Preferred Date</label>
+                    <input type="date" name="appointment_date" required>
+                </div>
+                <button type="submit" class="btn-book">Book Now</button>
+            </form>
+
+            <!-- CTA Buttons for Logged Out Users -->
+            <?php if (!isset($_SESSION['user_id'])): ?>
+            <div class="cta-buttons">
+                <a href="/vehicare_db/services.php" class="btn-secondary-cta">View Services</a>
+                <a href="/vehicare_db/login.php" class="btn-primary-cta">Sign In</a>
+            </div>
+            <?php else: ?>
+            <div class="cta-buttons">
+                <a href="/vehicare_db/client/dashboard.php" class="btn-primary-cta">Go to Dashboard</a>
+                <a href="/vehicare_db/services.php" class="btn-secondary-cta">View Services</a>
+            </div>
+            <?php endif; ?>
         </div>
-        <p>"VehiCare provided exceptional service for my car. The technicians were knowledgeable and courteous. Highly recommended!"</p>
-        <p class="author">- John M.</p>
-      </div>
-      <div class="testimonial-card">
-        <div class="stars">
-          <i class="fas fa-star"></i>
-          <i class="fas fa-star"></i>
-          <i class="fas fa-star"></i>
-          <i class="fas fa-star"></i>
-          <i class="fas fa-star"></i>
-        </div>
-        <p>"I've been bringing my vehicle here for 3 years. Great service, fair prices, and honest advice. You can trust them."</p>
-        <p class="author">- Sarah K.</p>
-      </div>
-      <div class="testimonial-card">
-        <div class="stars">
-          <i class="fas fa-star"></i>
-          <i class="fas fa-star"></i>
-          <i class="fas fa-star"></i>
-          <i class="fas fa-star"></i>
-          <i class="fas fa-star"></i>
-        </div>
-        <p>"Best automotive service in town. They fixed my engine issue quickly and the pricing was very reasonable."</p>
-        <p class="author">- Mike D.</p>
-      </div>
-    </div>
-  </div>
-</section>
 
-<!-- Contact Section -->
-<section class="contact-section" id="contact">
-  <div class="container">
-    <h2 class="section-title">Contact Information</h2>
-    <div class="contact-grid">
-      <div class="contact-item">
-        <i class="fas fa-map-marker-alt"></i>
-        <h3>Location</h3>
-        <p>123 Auto Service Lane<br>Your City, State 12345</p>
-      </div>
-      <div class="contact-item">
-        <i class="fas fa-phone"></i>
-        <h3>Phone</h3>
-        <p>+1 (555) 123-4567<br>+1 (555) 123-4568</p>
-      </div>
-      <div class="contact-item">
-        <i class="fas fa-clock"></i>
-        <h3>Hours</h3>
-        <p>Mon - Fri: 8:00 AM - 6:00 PM<br>Sat: 9:00 AM - 4:00 PM</p>
-      </div>
+        <!-- Right Image with Specs -->
+        <div class="hero-image">
+            <img src="https://via.placeholder.com/500x400?text=Premium+Vehicle+Maintenance" alt="Premium Car Maintenance">
+            
+            <!-- Car Specs Card -->
+            <div class="car-specs">
+                <div class="car-specs-header">
+                    <img src="https://via.placeholder.com/70x70?text=Car" alt="Featured Service">
+                    <div class="car-specs-info">
+                        <h4>Premium Service</h4>
+                        <p>Full Maintenance</p>
+                    </div>
+                </div>
+                <div class="spec-row">
+                    <div class="spec-item">
+                        <span class="value">2hrs</span>
+                        <span class="label">Duration</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="value">$99</span>
+                        <span class="label">Price</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="value">★★★★★</span>
+                        <span class="label">Rating</span>
+                    </div>
+                </div>
+                <div class="specs-footer">
+                    <a href="/vehicare_db/services.php">View Details →</a>
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
 </section>
 
 <?php include __DIR__ . '/includes/footer.php'; ?>

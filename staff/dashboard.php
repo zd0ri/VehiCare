@@ -11,6 +11,15 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'staff') {
 include __DIR__ . '/../includes/header.php';
 ?>
 
+<style>
+    * {
+        font-family: 'Poppins', sans-serif;
+    }
+    body {
+        font-family: 'Poppins', sans-serif;
+    }
+</style>
+
 <div style="max-width: 1200px; margin: 40px auto; padding: 0 20px;">
     <div style="background: linear-gradient(135deg, #1a3a52 0%, #2d5a7b 100%); color: white; padding: 40px; border-radius: 12px; margin-bottom: 30px;">
         <h1 style="margin: 0 0 10px 0;">Welcome, <?php echo htmlspecialchars($_SESSION['full_name']); ?>!</h1>

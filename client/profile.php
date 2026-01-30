@@ -86,7 +86,23 @@ $user = $result->fetch_assoc();
 include __DIR__ . '/../includes/header.php';
 ?>
 
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
 <style>
+    :root {
+        --teal-color: #0ea5a4;
+        --teal-dark: #0b7f7f;
+        --primary: #d4794a;
+    }
+
+    * {
+        font-family: 'Poppins', sans-serif;
+    }
+
+    body {
+        font-family: 'Poppins', sans-serif;
+    }
+
     .profile-container {
         max-width: 1200px;
         margin: 0 auto;
@@ -381,20 +397,22 @@ include __DIR__ . '/../includes/header.php';
     <!-- Profile Update Section -->
     <div class="section">
         <h2>Profile Picture</h2>
-        <div class="upload-section" onclick="document.getElementById('fileInput').click();">
-            <input type="file" id="fileInput" accept="image/*">
-            <i class="fas fa-cloud-upload-alt"></i>
-            <p><strong>Click to upload</strong> or drag and drop</p>
-            <p style="font-size: 0.85em; color: #999;">PNG, JPG, GIF, WebP (Max 5MB)</p>
-        </div>
-        <div style="margin-top: 20px; text-align: center;">
-            <p style="color: #666; font-size: 0.9em;">Uploading...</p>
-            <div id="uploadProgress" style="display: none; margin-top: 10px;">
-                <div style="width: 100%; background: #e0e0e0; border-radius: 5px; height: 8px;">
-                    <div id="progressBar" style="width: 0%; height: 100%; background: #27ae60; border-radius: 5px; transition: width 0.3s;"></div>
+        <form id="profilePictureForm" enctype="multipart/form-data">
+            <div class="upload-section" onclick="document.getElementById('fileInput').click();">
+                <input type="file" id="fileInput" name="profile_picture" accept="image/*">
+                <i class="fas fa-cloud-upload-alt"></i>
+                <p><strong>Click to upload</strong> or drag and drop</p>
+                <p style="font-size: 0.85em; color: #999;">PNG, JPG, GIF, WebP (Max 5MB)</p>
+            </div>
+            <div style="margin-top: 20px; text-align: center;">
+                <p style="color: #666; font-size: 0.9em;" id="uploadStatus"></p>
+                <div id="uploadProgress" style="display: none; margin-top: 10px;">
+                    <div style="width: 100%; background: #e0e0e0; border-radius: 5px; height: 8px;">
+                        <div id="progressBar" style="width: 0%; height: 100%; background: #27ae60; border-radius: 5px; transition: width 0.3s;"></div>
+                    </div>
                 </div>
             </div>
-        </div>
+        </form>
     </div>
 
     <!-- Personal Information Section -->
@@ -421,24 +439,24 @@ include __DIR__ . '/../includes/header.php';
                 </div>
                 <div class="form-group">
                     <label for="city">City</label>
-                    <input type="text" id="city" name="city" value="<?php echo htmlspecialchars($user['city'] ?: ''); ?>">
+                    <input type="text" id="city" name="city" value="<?php echo htmlspecialchars($user['city'] ?? ''); ?>">
                 </div>
             </div>
 
             <div class="form-row">
                 <div class="form-group">
                     <label for="state">State/Province</label>
-                    <input type="text" id="state" name="state" value="<?php echo htmlspecialchars($user['state'] ?: ''); ?>">
+                    <input type="text" id="state" name="state" value="<?php echo htmlspecialchars($user['state'] ?? ''); ?>">
                 </div>
                 <div class="form-group">
                     <label for="zip_code">Zip Code</label>
-                    <input type="text" id="zip_code" name="zip_code" value="<?php echo htmlspecialchars($user['zip_code'] ?: ''); ?>">
+                    <input type="text" id="zip_code" name="zip_code" value="<?php echo htmlspecialchars($user['zip_code'] ?? ''); ?>">
                 </div>
             </div>
 
             <div class="form-group">
                 <label for="address">Address</label>
-                <textarea id="address" name="address"><?php echo htmlspecialchars($user['address'] ?: ''); ?></textarea>
+                <textarea id="address" name="address"><?php echo htmlspecialchars($user['address'] ?? ''); ?></textarea>
             </div>
 
             <div class="button-group">
@@ -523,6 +541,7 @@ include __DIR__ . '/../includes/header.php';
     // File upload handler
     const fileInput = document.getElementById('fileInput');
     const uploadSection = document.querySelector('.upload-section');
+    const uploadStatus = document.getElementById('uploadStatus');
 
     // Click to upload
     uploadSection.addEventListener('click', () => fileInput.click());
@@ -566,13 +585,15 @@ include __DIR__ . '/../includes/header.php';
         // Disable file input
         fileInput.disabled = true;
         uploadSection.style.opacity = '0.6';
+        uploadStatus.textContent = 'Uploading...';
 
         const xhr = new XMLHttpRequest();
 
         xhr.upload.addEventListener('progress', (e) => {
             if (e.lengthComputable) {
                 const percentComplete = (e.loaded / e.total) * 100;
-                console.log(percentComplete + '% uploaded');
+                document.getElementById('progressBar').style.width = percentComplete + '%';
+                document.getElementById('uploadProgress').style.display = 'block';
             }
         });
 
@@ -585,6 +606,8 @@ include __DIR__ . '/../includes/header.php';
                     uploadSection.style.opacity = '1';
 
                     if (response.success) {
+                        uploadStatus.textContent = response.message;
+                        uploadStatus.style.color = '#155724';
                         messageEl.textContent = response.message;
                         messageEl.className = 'alert show alert-success';
                         
@@ -593,6 +616,8 @@ include __DIR__ . '/../includes/header.php';
                             location.reload();
                         }, 1500);
                     } else {
+                        uploadStatus.textContent = response.message;
+                        uploadStatus.style.color = '#721c24';
                         messageEl.textContent = response.message;
                         messageEl.className = 'alert show alert-error';
                     }
@@ -600,10 +625,15 @@ include __DIR__ . '/../includes/header.php';
                     // Auto-hide after 5 seconds
                     setTimeout(() => {
                         messageEl.className = 'alert';
+                        uploadStatus.textContent = '';
+                        document.getElementById('uploadProgress').style.display = 'none';
+                        document.getElementById('progressBar').style.width = '0%';
                     }, 5000);
                 } catch (e) {
                     fileInput.disabled = false;
                     uploadSection.style.opacity = '1';
+                    uploadStatus.textContent = 'Error uploading file';
+                    uploadStatus.style.color = '#721c24';
                     messageEl.textContent = 'Error uploading file';
                     messageEl.className = 'alert show alert-error';
                 }
@@ -613,6 +643,8 @@ include __DIR__ . '/../includes/header.php';
         xhr.addEventListener('error', () => {
             fileInput.disabled = false;
             uploadSection.style.opacity = '1';
+            uploadStatus.textContent = 'Upload failed';
+            uploadStatus.style.color = '#721c24';
             messageEl.textContent = 'Upload failed';
             messageEl.className = 'alert show alert-error';
         });

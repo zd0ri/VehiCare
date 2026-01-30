@@ -12,6 +12,14 @@ include __DIR__ . '/../includes/header.php';
 ?>
 
 <style>
+    * {
+        font-family: 'Poppins', sans-serif;
+    }
+
+    body {
+        font-family: 'Poppins', sans-serif;
+    }
+
     .client-dashboard {
         max-width: 1400px;
         margin: 0 auto;
