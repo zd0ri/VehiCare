@@ -53,7 +53,7 @@ $totalStaff = $conn->query("SELECT COUNT(*) as count FROM staff")->fetch_assoc()
         /* Sidebar Navigation */
         .sidebar {
             width: 220px;
-            background: linear-gradient(180deg, #0052cc 0%, #0052cc 100%);
+            background: linear-gradient(180deg, #dc143c 0%, #dc143c 100%);
             position: fixed;
             height: 100vh;
             overflow-y: auto;
@@ -105,7 +105,7 @@ $totalStaff = $conn->query("SELECT COUNT(*) as count FROM staff")->fetch_assoc()
         .sidebar-menu a.active {
             background: rgba(255, 255, 255, 0.1);
             color: #fff;
-            border-left-color: #ff6b6b;
+            border-left-color: #a01030;
         }
 
         .sidebar-menu i {
@@ -164,7 +164,7 @@ $totalStaff = $conn->query("SELECT COUNT(*) as count FROM staff")->fetch_assoc()
         .header-user i {
             width: 30px;
             height: 30px;
-            background: #0052cc;
+            background: #dc143c;
             color: white;
             border-radius: 50%;
             display: flex;
@@ -201,7 +201,7 @@ $totalStaff = $conn->query("SELECT COUNT(*) as count FROM staff")->fetch_assoc()
         }
 
         .metric-card.blue {
-            border-top: 4px solid #0052cc;
+            border-top: 4px solid #dc143c;
         }
 
         .metric-label {
@@ -263,7 +263,7 @@ $totalStaff = $conn->query("SELECT COUNT(*) as count FROM staff")->fetch_assoc()
         }
 
         .card-header .btn-link {
-            color: #0052cc;
+            color: #dc143c;
             text-decoration: none;
             font-size: 12px;
             font-weight: 600;
@@ -520,13 +520,13 @@ $totalStaff = $conn->query("SELECT COUNT(*) as count FROM staff")->fetch_assoc()
                     datasets: [{
                         label: 'Revenue',
                         data: [65000, 75000, 72000, 85000, 95000, 88000],
-                        borderColor: '#0052cc',
+                        borderColor: '#dc143c',
                         backgroundColor: 'rgba(0, 82, 204, 0.05)',
                         borderWidth: 2,
                         tension: 0.4,
                         fill: true,
                         pointRadius: 5,
-                        pointBackgroundColor: '#0052cc'
+                        pointBackgroundColor: '#dc143c'
                     }]
                 },
                 options: {

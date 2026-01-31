@@ -20,9 +20,9 @@ $logs = $conn->query("SELECT a.*, u.full_name FROM audittrail a LEFT JOIN users 
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --teal-color: #0ea5a4;
-            --teal-dark: #0b7f7f;
-            --primary: #d4794a;
+            --teal-color: #dc143c;
+            --teal-dark: #a01030;
+            --primary: #dc143c;
         }
         
         body {

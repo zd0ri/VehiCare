@@ -48,7 +48,7 @@ if (!isset($page_icon)) {
         /* Sidebar Navigation */
         .sidebar {
             width: 220px;
-            background: linear-gradient(180deg, #0052cc 0%, #0052cc 100%);
+            background: linear-gradient(180deg, #dc143c 0%, #dc143c 100%);
             position: fixed;
             height: 100vh;
             overflow-y: auto;
@@ -103,7 +103,7 @@ if (!isset($page_icon)) {
         .sidebar-menu a.active {
             background: rgba(255, 255, 255, 0.1);
             color: #fff;
-            border-left-color: #ff6b6b;
+            border-left-color: #a01030;
         }
 
         .sidebar-menu i {
@@ -162,7 +162,7 @@ if (!isset($page_icon)) {
         .header-user i {
             width: 30px;
             height: 30px;
-            background: #0052cc;
+            background: #dc143c;
             color: white;
             border-radius: 50%;
             display: flex;
@@ -205,7 +205,7 @@ if (!isset($page_icon)) {
         }
 
         .card-header-link {
-            color: #0052cc;
+            color: #dc143c;
             text-decoration: none;
             font-size: 12px;
             font-weight: 600;

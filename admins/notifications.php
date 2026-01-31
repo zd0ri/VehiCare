@@ -34,9 +34,9 @@ $clients = $conn->query("SELECT user_id, full_name FROM users WHERE role='client
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --teal-color: #0ea5a4;
-            --teal-dark: #0b7f7f;
-            --primary: #d4794a;
+            --teal-color: #dc143c;
+            --teal-dark: #a01030;
+            --primary: #dc143c;
         }
         
         body {

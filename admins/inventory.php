@@ -7,7 +7,23 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
     exit;
 }
 
-$inventory = $conn->query("SELECT p.*, i.quantity, i.last_updated FROM parts p LEFT JOIN inventory i ON p.part_id = i.part_id ORDER BY p.part_name");
+// Retrieve all parts with inventory information
+$inventory = $conn->query("SELECT p.`part_id`, p.`part_name`, p.`brand`, p.`price`, 
+                          COALESCE(i.`quantity`, 0) as `quantity`, 
+                          i.`last_updated`
+                          FROM `parts` p
+                          LEFT JOIN `inventory` i ON p.`part_id` = i.`part_id`
+                          ORDER BY p.`part_name`");
+
+// Get inventory statistics
+$stats = $conn->query("SELECT 
+  COUNT(p.`part_id`) as total_parts,
+  SUM(i.`quantity`) as total_quantity,
+  SUM(p.`price` * i.`quantity`) as total_value,
+  COUNT(CASE WHEN i.`quantity` = 0 OR i.`quantity` IS NULL THEN 1 END) as out_of_stock,
+  COUNT(CASE WHEN i.`quantity` <= 20 AND i.`quantity` > 0 THEN 1 END) as low_stock
+FROM `parts` p
+LEFT JOIN `inventory` i ON p.`part_id` = i.`part_id`")->fetch_assoc();
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -20,9 +36,9 @@ $inventory = $conn->query("SELECT p.*, i.quantity, i.last_updated FROM parts p L
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --teal-color: #0ea5a4;
-            --teal-dark: #0b7f7f;
-            --primary: #d4794a;
+            --teal-color: #dc143c;
+            --teal-dark: #a01030;
+            --primary: #dc143c;
         }
         
         body {
@@ -139,8 +155,8 @@ $inventory = $conn->query("SELECT p.*, i.quantity, i.last_updated FROM parts p L
                         <th>Part Name</th>
                         <th>Brand</th>
                         <th>Price</th>
-                        <th>Stock</th>
                         <th>Quantity</th>
+                        <th>Total Value</th>
                         <th>Last Updated</th>
                         <th>Status</th>
                         <th>Actions</th>
@@ -153,13 +169,13 @@ $inventory = $conn->query("SELECT p.*, i.quantity, i.last_updated FROM parts p L
                             <td><strong><?php echo htmlspecialchars($item['part_name']); ?></strong></td>
                             <td><?php echo htmlspecialchars($item['brand'] ?? 'N/A'); ?></td>
                             <td>₱<?php echo number_format($item['price'] ?? 0, 2); ?></td>
-                            <td><?php echo $item['stock'] ?? 0; ?></td>
                             <td><?php echo $item['quantity'] ?? 0; ?></td>
-                            <td><?php echo $item['last_updated'] ? date('M d, Y', strtotime($item['last_updated'])) : 'N/A'; ?></td>
+                            <td>₱<?php echo number_format(($item['price'] ?? 0) * ($item['quantity'] ?? 0), 2); ?></td>
+                            <td><?php echo $item['last_updated'] ? date('M d, Y', strtotime($item['last_updated'])) : 'Never'; ?></td>
                             <td>
                                 <?php $qty = $item['quantity'] ?? 0; ?>
-                                <span class="badge bg-<?php echo $qty > 5 ? 'success' : ($qty > 0 ? 'warning' : 'danger'); ?>">
-                                    <?php echo $qty > 5 ? 'In Stock' : ($qty > 0 ? 'Low Stock' : 'Out of Stock'); ?>
+                                <span class="badge bg-<?php echo $qty > 20 ? 'success' : ($qty > 0 ? 'warning' : 'danger'); ?>">
+                                    <?php echo $qty > 20 ? 'In Stock' : ($qty > 0 ? 'Low Stock' : 'Out of Stock'); ?>
                                 </span>
                             </td>
                             <td>

@@ -64,7 +64,7 @@ foreach ($users as $user) {
         /* Sidebar Navigation */
         .sidebar {
             width: 220px;
-            background: linear-gradient(180deg, #0052cc 0%, #0052cc 100%);
+            background: linear-gradient(180deg, #dc143c 0%, #dc143c 100%);
             position: fixed;
             height: 100vh;
             overflow-y: auto;
@@ -119,7 +119,7 @@ foreach ($users as $user) {
         .sidebar-menu a.active {
             background: rgba(255, 255, 255, 0.1);
             color: #fff;
-            border-left-color: #ff6b6b;
+            border-left-color: #a01030;
         }
 
         .sidebar-menu i {
@@ -178,7 +178,7 @@ foreach ($users as $user) {
         .header-user i {
             width: 30px;
             height: 30px;
-            background: #0052cc;
+            background: #dc143c;
             color: white;
             border-radius: 50%;
             display: flex;
@@ -208,7 +208,7 @@ foreach ($users as $user) {
             padding: 25px;
             text-align: center;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-            border-top: 4px solid #ff6b6b;
+            border-top: 4px solid #dc143c;
             transition: all 0.3s ease;
         }
 
@@ -222,7 +222,7 @@ foreach ($users as $user) {
         }
 
         .stat-card.staff {
-            border-top-color: #0052cc;
+            border-top-color: #dc143c;
         }
 
         .stat-card.client {
@@ -273,9 +273,9 @@ foreach ($users as $user) {
 
         .filter-section input:focus,
         .filter-section select:focus {
-            border-color: #0052cc;
+            border-color: #dc143c;
             outline: none;
-            box-shadow: 0 0 0 3px rgba(0, 82, 204, 0.1);
+            box-shadow: 0 0 0 3px rgba(220, 20, 60, 0.1);
         }
 
         /* Table Styles */
@@ -329,7 +329,7 @@ foreach ($users as $user) {
             width: 40px;
             height: 40px;
             border-radius: 50%;
-            background: linear-gradient(135deg, #0052cc 0%, #0088ff 100%);
+            background: linear-gradient(135deg, #dc143c 0%, #a01030 100%);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -405,12 +405,12 @@ foreach ($users as $user) {
         }
 
         .btn-info {
-            background: #e7f3ff;
-            color: #0052cc;
+            background: #ffe6e6;
+            color: #dc143c;
         }
 
         .btn-info:hover {
-            background: #0052cc;
+            background: #dc143c;
             color: white;
         }
 
@@ -508,7 +508,7 @@ foreach ($users as $user) {
                         <div class="stat-label">Administrators</div>
                     </div>
                     <div class="stat-card staff">
-                        <i class="fas fa-wrench" style="color: #0052cc;"></i>
+                        <i class="fas fa-wrench" style="color: #dc143c;"></i>
                         <div class="stat-number"><?php echo $staff_count; ?></div>
                         <div class="stat-label">Staff Members</div>
                     </div>
@@ -714,7 +714,7 @@ foreach ($users as $user) {
         }
 
         .table thead {
-            background: linear-gradient(135deg, #1a3a52 0%, #2d5a7b 100%);
+            background: linear-gradient(135deg, #dc143c 0%, #a01030 100%);
             color: white;
         }
 
@@ -736,7 +736,7 @@ foreach ($users as $user) {
             width: 40px;
             height: 40px;
             border-radius: 50%;
-            background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);
+            background: linear-gradient(135deg, #dc143c 0%, #a01030 100%);
             display: flex;
             align-items: center;
             justify-content: center;

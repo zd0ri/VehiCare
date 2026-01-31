@@ -25,9 +25,9 @@ $ratings = $conn->query("
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <style>
         :root {
-            --teal-color: #0ea5a4;
-            --teal-dark: #0b7f7f;
-            --primary: #d4794a;
+            --teal-color: #dc143c;
+            --teal-dark: #a01030;
+            --primary: #dc143c;
         }
         
         body {
@@ -95,7 +95,7 @@ $ratings = $conn->query("
         }
         
         .stars {
-            color: #ffc107;
+            color: #dc143c;
         }
     </style>
 </head>

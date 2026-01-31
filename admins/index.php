@@ -14,7 +14,7 @@ $stats['total_clients'] = $conn->query("SELECT COUNT(*) as count FROM users WHER
 $stats['total_appointments'] = $conn->query("SELECT COUNT(*) as count FROM appointments WHERE status IN ('Pending', 'Confirmed')")->fetch_assoc()['count'] ?? 0;
 $stats['pending_payments'] = $conn->query("SELECT SUM(grand_total) as total FROM invoices")->fetch_assoc()['total'] ?? 0;
 $stats['total_revenue'] = $conn->query("SELECT SUM(grand_total) as total FROM invoices WHERE invoice_id IS NOT NULL")->fetch_assoc()['total'] ?? 0;
-$stats['total_technicians'] = $conn->query("SELECT COUNT(*) as count FROM staff")->fetch_assoc()['count'] ?? 0;
+$stats['total_technicians'] = $conn->query("SELECT COUNT(*) as count FROM users WHERE role = 'staff' AND status = 'active'")->fetch_assoc()['count'] ?? 0;
 $stats['queue_pending'] = $conn->query("SELECT COUNT(*) as count FROM queue WHERE status = 'pending'")->fetch_assoc()['count'] ?? 0;
 
 // Get recent appointments
@@ -47,10 +47,10 @@ if (!$notifications) {
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --teal-color: #0ea5a4;
-            --teal-dark: #0b7f7f;
-            --primary: #d4794a;
-            --secondary: #e8934b;
+            --teal-color: #dc143c;
+            --teal-dark: #a01030;
+            --primary: #dc143c;
+            --secondary: #a01030;
         }
         
         * {
