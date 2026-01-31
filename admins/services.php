@@ -34,7 +34,7 @@ $servicesQuery = $conn->query("SELECT * FROM services ORDER BY service_id DESC")
 </div>
 
 <div class="admin-main-content">
-  <h1 style="color: #1a3a52; margin-bottom: 20px;">Manage Services</h1>
+  <h1 style="color: #1a1a1a; margin-bottom: 20px;">Manage Services</h1>
   
   <div class="table-container">
     <div class="table-header">

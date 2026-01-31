@@ -1,14 +1,14 @@
 /* VehiCare Admin Dashboard Stylesheet */
 
 :root {
-    --teal-color: #0ea5a4;
-    --teal-dark: #0b7f7f;
-    --primary: #d4794a;
-    --secondary: #e8934b;
-    --light-gray: #f5f7fa;
-    --border-color: #e0e6ed;
-    --text-dark: #2c3e50;
-    --text-muted: #7f8c8d;
+    --teal-color: #dc143c;
+    --teal-dark: #a01030;
+    --primary: #dc143c;
+    --secondary: #1a1a1a;
+    --light-gray: #f5f5f5;
+    --border-color: #cccccc;
+    --text-dark: #1a1a1a;
+    --text-muted: #666666;
 }
 
 /* Admin-mode navbar (compact topbar) */
@@ -55,7 +55,7 @@ body.admin-mode .navbar .dropdown-item {
 
 body.admin-mode .navbar .dropdown-item:hover,
 body.admin-mode .navbar .dropdown-item.active {
-  background: #f0e9ff;
+  background: #ffe6eb;
   color: var(--admin-primary);
 }
 

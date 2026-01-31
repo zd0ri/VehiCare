@@ -1,20 +1,20 @@
 /* VehiCare System - Main Stylesheet */
 
 :root {
-  --primary-color: #d4794a;
-  --secondary-color: #e8934b;
-  --accent-color: #2c5aa0;
-  --teal-color: #0ea5a4;
-  --teal-dark: #0b7f7f;
-  --hero-dark: #074f4f;
-  --hero-text-light: #f8fafc;
+  --primary-color: #dc143c;
+  --secondary-color: #1a1a1a;
+  --accent-color: #dc143c;
+  --teal-color: #dc143c;
+  --teal-dark: #a01030;
+  --hero-dark: #1a1a1a;
+  --hero-text-light: #ffffff;
   --success-color: #27ae60;
   --warning-color: #f39c12;
-  --danger-color: #e74c3c;
-  --light-gray: #ecf0f1;
-  --dark-gray: #34495e;
-  --text-color: #333;
-  --border-color: #bdc3c7;
+  --danger-color: #dc143c;
+  --light-gray: #f5f5f5;
+  --dark-gray: #1a1a1a;
+  --text-color: #1a1a1a;
+  --border-color: #cccccc;
 }
 
 * {
@@ -26,7 +26,7 @@
 body {
   font-family: 'Poppins', 'Roboto', sans-serif;
   color: var(--text-color);
-  background-color: #f8f9fa;
+  background-color: #f5f5f5;
   line-height: 1.6;
 }
 
@@ -139,7 +139,7 @@ body {
 /* Dark navbar helper class (use when you want a dark header)
    Add class 'dark' to <nav class="navbar"> to keep the previous dark style */
 .navbar.dark {
-  background: linear-gradient(135deg, var(--teal-color) 0%, var(--teal-dark) 100%) !important;
+  background: #dc143c !important;
   box-shadow: 0 2px 12px rgba(0,0,0,0.08);
 }
 
@@ -297,7 +297,7 @@ body {
 
 /* Appointments Section */
 .appointments-section {
-  background: linear-gradient(135deg, #fef3e6 0%, #fae8d8 100%);
+  background: linear-gradient(135deg, #f0f0f0 0%, #e8e8e8 100%);
   padding: 80px 20px;
 }
 
@@ -389,7 +389,7 @@ body {
 
 /* Testimonials Section */
 .testimonials-section {
-  background: linear-gradient(135deg, #2c5aa0 0%, #3a6bb6 100%);
+  background: linear-gradient(135deg, #dc143c 0%, #a01030 100%);
   color: #fff;
   padding: 80px 20px;
 }

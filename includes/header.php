@@ -90,8 +90,8 @@
 </head>
 
 <body>
-  <nav class="navbar dark navbar-expand-lg" style="background: transparent; padding: 20px 40px;">
-    <div class="container-fluid" style="background: #2c3e50; border-radius: 50px; padding: 12px 30px; display: flex; align-items: center; gap: 30px;">
+  <nav class="navbar dark navbar-expand-lg" style="background: #dc143c; padding: 20px 40px;">
+    <div class="container-fluid" style="background: #1a1a1a; border-radius: 50px; padding: 12px 30px; display: flex; align-items: center; gap: 30px;">
       <a class="navbar-brand" href="/vehicare_db/index.php" style="font-size: 24px; font-weight: 700; color: #fff; display: flex; align-items: center; margin: 0;">
         <i class="fas fa-car" style="margin-right: 8px;"></i> VehiCare
       </a>
@@ -108,6 +108,9 @@
           </li>
           <li class="nav-item">
             <a class="nav-link" href="/vehicare_db/services.php" style="color: #fff; padding: 8px 16px;">Services</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/vehicare_db/shop.php" style="color: #fff; padding: 8px 16px;">Shop</a>
           </li>
           <li class="nav-item">
             <a class="nav-link" href="/vehicare_db/about.php" style="color: #fff; padding: 8px 16px;">About</a>

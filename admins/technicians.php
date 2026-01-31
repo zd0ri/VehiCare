@@ -173,7 +173,7 @@ $technicians = $conn->query("SELECT s.*, AVG(r.rating) as avg_rating FROM staff 
     <div class="modal fade" id="addModal" tabindex="-1">
         <div class="modal-dialog">
             <div class="modal-content">
-                <div class="modal-header" style="background: linear-gradient(135deg, var(--teal-dark) 0%, var(--teal-color) 100%); color: #fff;">
+                <div class="modal-header" style="background: linear-gradient(135deg, #a01030 0%, #dc143c 100%); color: #fff;">
                     <h5 class="modal-title">Add Technician</h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>

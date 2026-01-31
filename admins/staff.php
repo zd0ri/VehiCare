@@ -28,7 +28,7 @@ $staffQuery = $conn->query("SELECT * FROM staff ORDER BY staff_id DESC");
 </div>
 
 <div class="admin-main-content">
-  <h1 style="color: #1a3a52; margin-bottom: 20px;">Manage Staff</h1>
+  <h1 style="color: #1a1a1a; margin-bottom: 20px;">Manage Staff</h1>
   
   <div class="table-container">
     <div class="table-header">

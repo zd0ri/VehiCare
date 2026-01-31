@@ -31,7 +31,7 @@ $partsQuery = $conn->query("SELECT * FROM parts ORDER BY part_id DESC");
 </div>
 
 <div class="admin-main-content">
-  <h1 style="color: #1a3a52; margin-bottom: 20px;">Parts & Inventory</h1>
+  <h1 style="color: #1a1a1a; margin-bottom: 20px;">Parts & Inventory</h1>
   
   <div class="table-container">
     <div class="table-header">

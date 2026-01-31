@@ -107,7 +107,7 @@ include __DIR__ . '/includes/header.php';
     .search-filters select:focus,
     .search-filters input:focus {
         outline: none;
-        border-bottom-color: #0066cc;
+        border-bottom-color: #dc143c;
         background: transparent;
     }
 
@@ -121,7 +121,7 @@ include __DIR__ . '/includes/header.php';
     }
 
     .btn-book {
-        background: #0066cc;
+        background: #dc143c;
         color: white;
         border: none;
         padding: 12px 30px;
@@ -130,13 +130,13 @@ include __DIR__ . '/includes/header.php';
         cursor: pointer;
         transition: all 0.3s ease;
         font-size: 0.95em;
-        box-shadow: 0 4px 15px rgba(0, 102, 204, 0.3);
+        box-shadow: 0 4px 15px rgba(220, 20, 60, 0.3);
     }
 
     .btn-book:hover {
-        background: #0052a3;
+        background: #a01030;
         transform: translateY(-2px);
-        box-shadow: 0 6px 25px rgba(0, 102, 204, 0.4);
+        box-shadow: 0 6px 25px rgba(220, 20, 60, 0.4);
     }
 
     .cta-buttons {
@@ -155,15 +155,15 @@ include __DIR__ . '/includes/header.php';
     }
 
     .btn-primary-cta {
-        background: #0066cc;
+        background: #dc143c;
         color: white;
-        box-shadow: 0 4px 15px rgba(0, 102, 204, 0.3);
+        box-shadow: 0 4px 15px rgba(220, 20, 60, 0.3);
     }
 
     .btn-primary-cta:hover {
-        background: #0052a3;
+        background: #a01030;
         transform: translateY(-2px);
-        box-shadow: 0 6px 25px rgba(0, 102, 204, 0.4);
+        box-shadow: 0 6px 25px rgba(220, 20, 60, 0.4);
     }
 
     .btn-secondary-cta {
@@ -269,7 +269,7 @@ include __DIR__ . '/includes/header.php';
     }
 
     .specs-footer a {
-        color: #0066cc;
+        color: #dc143c;
         text-decoration: none;
         font-weight: 600;
         font-size: 0.9em;
@@ -280,7 +280,7 @@ include __DIR__ . '/includes/header.php';
     }
 
     .specs-footer a:hover {
-        color: #0052a3;
+        color: #a01030;
     }
 
     @media (max-width: 1024px) {
