@@ -7,168 +7,63 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
     exit;
 }
 
-// Fetch payments
-$paymentsQuery = $conn->query("
-  SELECT p.*, a.appointment_id, u.full_name, s.service_name
-  FROM payments p
-  LEFT JOIN appointments a ON p.appointment_id = a.appointment_id
-  LEFT JOIN users u ON p.client_id = u.user_id
-  LEFT JOIN services s ON a.service_id = s.service_id
-  ORDER BY p.payment_date DESC
-");
+// Fetch payments with fallback to orders relationship
+try {
+    // Try the new structure first (with appointment_id and client_id in payments table)
+    $paymentsQuery = $conn->query("
+      SELECT p.*, 
+             COALESCE(p.appointment_id, a2.appointment_id) as appointment_id,
+             COALESCE(u.full_name, u2.full_name, 'Unknown Client') as full_name,
+             COALESCE(s.service_name, 'No Service') as service_name
+      FROM payments p
+      LEFT JOIN appointments a ON p.appointment_id = a.appointment_id
+      LEFT JOIN users u ON p.client_id = u.user_id
+      LEFT JOIN orders o ON p.order_id = o.order_id
+      LEFT JOIN users u2 ON o.client_id = u2.user_id
+      LEFT JOIN appointments a2 ON u2.user_id = a2.client_id
+      LEFT JOIN services s ON COALESCE(a.service_id, a2.service_id) = s.service_id
+      ORDER BY p.payment_date DESC
+    ");
+} catch (Exception $e) {
+    // Fallback to orders-based relationship if new columns don't exist yet
+    $paymentsQuery = $conn->query("
+      SELECT p.*, o.order_id, u.full_name, 'N/A' as service_name
+      FROM payments p
+      LEFT JOIN orders o ON p.order_id = o.order_id
+      LEFT JOIN users u ON o.client_id = u.user_id
+      ORDER BY p.payment_date DESC
+    ");
+}
+
+$page_title = "Payments";
+$page_icon = "fas fa-credit-card";
+include __DIR__ . '/includes/admin_layout_header.php';
 ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Payments - VehiCare Admin</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --teal-color: #dc143c;
-            --teal-dark: #a01030;
-            --primary: #dc143c;
-        }
-        
-        body {
-            font-family: 'Poppins', sans-serif;
-            background: #f5f7fa;
-        }
-        
-        .sidebar {
-            width: 280px;
-            background: linear-gradient(135deg, var(--teal-dark) 0%, var(--teal-color) 100%);
-            color: #fff;
-            padding: 20px 0;
-            position: fixed;
-            height: 100vh;
-            overflow-y: auto;
-        }
-        
-        .sidebar a {
-            display: flex;
-            align-items: center;
-            padding: 12px 20px;
-            color: rgba(255,255,255,0.8);
-            text-decoration: none;
-            transition: all 0.3s;
-            border-left: 3px solid transparent;
-        }
-        
-        .sidebar a:hover, .sidebar a.active {
-            background: rgba(255,255,255,0.1);
-            color: #fff;
-            border-left-color: var(--primary);
-        }
-        
-        .sidebar i {
-            width: 24px;
-            margin-right: 12px;
-        }
-        
-        .main-content {
-            margin-left: 280px;
-            padding: 30px;
-            width: calc(100% - 280px);
-        }
-        
-        .page-header {
-            background: #fff;
-            padding: 20px;
-            border-radius: 8px;
-            margin-bottom: 30px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .page-header h1 {
-            margin: 0;
-            color: var(--teal-dark);
-            font-weight: 700;
-        }
-        
-        .data-table {
-            background: #fff;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-        }
-        
-        .data-table thead {
-            background: linear-gradient(135deg, var(--teal-dark) 0%, var(--teal-color) 100%);
-            color: #fff;
-        }
-        
-        .data-table tbody tr:hover {
-            background: #f8f9fa;
-        }
-        
-        .modal-header {
-            background: linear-gradient(135deg, var(--teal-dark) 0%, var(--teal-color) 100%);
-            color: #fff;
-        }
-        
-        .btn-primary {
-            background: linear-gradient(135deg, var(--teal-dark) 0%, var(--teal-color) 100%);
-            border: none;
-        }
-        
-        .btn-primary:hover {
-            background: var(--teal-dark);
-            color: #fff;
-        }
-    </style>
-</head>
-<body>
-    <!-- Sidebar -->
-    <aside class="sidebar">
-        <div style="padding: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 20px;">
-            <h3 style="margin: 0;"><i class="fas fa-car me-2"></i>VehiCare</h3>
-            <small>Admin Panel</small>
-        </div>
-        
-        <a href="/vehicare_db/admins/index.php"><i class="fas fa-dashboard"></i>Dashboard</a>
-        <a href="/vehicare_db/admins/appointments.php"><i class="fas fa-calendar"></i>Appointments</a>
-        <a href="/vehicare_db/admins/walk_in_booking.php"><i class="fas fa-door-open"></i>Walk-In Bookings</a>
-        <a href="/vehicare_db/admins/clients.php"><i class="fas fa-users"></i>Clients</a>
-        <a href="/vehicare_db/admins/vehicles.php"><i class="fas fa-car"></i>Vehicles</a>
-        <a href="/vehicare_db/admins/technicians.php"><i class="fas fa-tools"></i>Technicians</a>
-        <a href="/vehicare_db/admins/assignments.php"><i class="fas fa-tasks"></i>Assignments</a>
-        <a href="/vehicare_db/admins/queue.php"><i class="fas fa-list-ol"></i>Queue</a>
-        <a href="/vehicare_db/admins/inventory.php"><i class="fas fa-boxes"></i>Inventory</a>
-        <a href="/vehicare_db/admins/payments.php" class="active"><i class="fas fa-credit-card"></i>Payments</a>
-        <a href="/vehicare_db/admins/invoices.php"><i class="fas fa-receipt"></i>Invoices</a>
-        <a href="/vehicare_db/admins/ratings.php"><i class="fas fa-star"></i>Ratings</a>
-        <a href="/vehicare_db/admins/notifications.php"><i class="fas fa-bell"></i>Notifications</a>
-        <a href="/vehicare_db/admins/audit_logs.php"><i class="fas fa-history"></i>Audit Logs</a>
-        <a href="/vehicare_db/logout.php" style="border-top: 1px solid rgba(255,255,255,0.1); margin-top: 20px; padding-top: 20px;"><i class="fas fa-sign-out-alt"></i>Logout</a>
-    </aside>
-    
-    <main class="main-content">
-        <div class="page-header">
-            <h1>Payment Tracking</h1>
-        </div>
-        
-        <div class="data-table">
-            <table class="table table-hover mb-0">
-                <thead>
-                    <tr>
-                        <th>Payment ID</th>
-                        <th>Client</th>
-                        <th>Service</th>
-                        <th>Amount</th>
-                        <th>Method</th>
-                        <th>Date</th>
-                        <th>Status</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
+
+<!-- Page Content -->
+<div class="content-card">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3>Payment Management</h3>
+        <button class="btn btn-primary" onclick="alert('Add payment feature coming soon')">
+            <i class="fas fa-plus"></i> Add Payment
+        </button>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-striped data-table">
+            <thead>
+                <tr>
+                    <th>Payment ID</th>
+                    <th>Client</th>
+                    <th>Service</th>
+                    <th>Amount</th>
+                    <th>Method</th>
+                    <th>Date</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
                     <?php if ($paymentsQuery && $paymentsQuery->num_rows > 0): ?>
                         <?php while ($payment = $paymentsQuery->fetch_assoc()): ?>
                         <tr>
@@ -194,8 +89,7 @@ $paymentsQuery = $conn->query("
                 </tbody>
             </table>
         </div>
-    </main>
-    
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+    </div>
+</div>
+
+<?php include __DIR__ . '/includes/admin_layout_footer.php'; ?>

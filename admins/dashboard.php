@@ -1,101 +1,662 @@
 <?php
-session_start();
-require_once __DIR__ . '/../includes/config.php';
+/**
+ * Admin Dashboard - Main Entry Point
+ * Displays statistics, quick actions, and recent activity
+ */
 
-// Check if admin is logged in
-if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
-    header("Location: /vehicare_db/login.php");
-    exit;
+// Page configuration
+$page_title = 'Dashboard';
+$page_icon = 'fas fa-tachometer-alt';
+$breadcrumbs = [
+    ['name' => 'Dashboard']
+];
+
+// Include the admin header
+include_once __DIR__ . '/../app/views/layouts/admin_header.php';
+
+// Include required models for dashboard data
+require_once __DIR__ . '/../app/models/BaseModel.php';
+require_once __DIR__ . '/../app/models/User.php';
+require_once __DIR__ . '/../app/models/Appointment.php';
+require_once __DIR__ . '/../app/models/Vehicle.php';
+require_once __DIR__ . '/../app/models/Service.php';
+
+// Initialize models
+$appointmentModel = new Appointment();
+$userModel = new User();
+$vehicleModel = new Vehicle();
+$serviceModel = new Service();
+
+// Get current date ranges for statistics
+$today = date('Y-m-d');
+$this_week_start = date('Y-m-d', strtotime('monday this week'));
+$this_month_start = date('Y-m-01');
+$last_month_start = date('Y-m-01', strtotime('-1 month'));
+$last_month_end = date('Y-m-t', strtotime('-1 month'));
+
+try {
+    // Get dashboard statistics based on user role
+    $stats = [];
+    
+    if ($rbac->hasPermission('view_all_appointments')) {
+        // Admin/Manager stats - full access
+        $stats['total_appointments'] = $appointmentModel->count();
+        $stats['today_appointments'] = $appointmentModel->count(['appointment_date' => $today]);
+        $stats['pending_appointments'] = $appointmentModel->count(['status' => 'pending']);
+        $stats['confirmed_appointments'] = $appointmentModel->count(['status' => 'confirmed']);
+        $stats['in_progress_appointments'] = $appointmentModel->count(['status' => 'in-progress']);
+        $stats['completed_today'] = $appointmentModel->count(['status' => 'completed', 'appointment_date' => $today]);
+        
+        // Client and vehicle stats
+        $stats['total_clients'] = $userModel->count(['role' => 'client']);
+        $stats['total_vehicles'] = $vehicleModel->count();
+        $stats['active_services'] = $serviceModel->count(['is_active' => 1]);
+        
+        // Revenue stats (if accessible)
+        $stats['month_revenue'] = 0; // TODO: Calculate from invoices
+        $stats['pending_payments'] = 0; // TODO: Calculate from payments table
+        
+    } else {
+        // Staff stats - limited to assigned work
+        $user_id = $current_user['id'];
+        $stats['my_assignments'] = $appointmentModel->count(['assigned_technician' => $user_id]);
+        $stats['my_pending'] = $appointmentModel->count(['assigned_technician' => $user_id, 'status' => 'pending']);
+        $stats['my_in_progress'] = $appointmentModel->count(['assigned_technician' => $user_id, 'status' => 'in-progress']);
+        $stats['my_completed_today'] = $appointmentModel->count([
+            'assigned_technician' => $user_id, 
+            'status' => 'completed', 
+            'appointment_date' => $today
+        ]);
+    }
+    
+    // Recent appointments (role-based)
+    $recent_appointments_conditions = [];
+    if (!$rbac->hasPermission('view_all_appointments')) {
+        $recent_appointments_conditions['assigned_technician'] = $current_user['id'];
+    }
+    
+    $recent_appointments = $appointmentModel->findAll(
+        $recent_appointments_conditions,
+        ['appointment_date' => 'DESC', 'appointment_time' => 'DESC'],
+        10
+    );
+    
+    // Get appointment details with related data
+    foreach ($recent_appointments as &$appointment) {
+        $client = $userModel->find($appointment['client_id']);
+        $vehicle = $vehicleModel->find($appointment['vehicle_id']);
+        $service = $serviceModel->find($appointment['service_id']);
+        
+        $appointment['client_name'] = $client ? $client['first_name'] . ' ' . $client['last_name'] : 'Unknown';
+        $appointment['vehicle_info'] = $vehicle ? $vehicle['year'] . ' ' . $vehicle['make'] . ' ' . $vehicle['model'] : 'Unknown Vehicle';
+        $appointment['service_name'] = $service ? $service['name'] : 'Unknown Service';
+    }
+    
+    // Quick stats for percentage changes (compare to last month)
+    $last_month_appointments = $appointmentModel->count([
+        'appointment_date >=' => $last_month_start,
+        'appointment_date <=' => $last_month_end
+    ]);
+    
+    $this_month_appointments = $appointmentModel->count([
+        'appointment_date >=' => $this_month_start
+    ]);
+    
+    $appointments_change = $last_month_appointments > 0 
+        ? (($this_month_appointments - $last_month_appointments) / $last_month_appointments) * 100 
+        : 0;
+
+} catch (Exception $e) {
+    error_log("Dashboard Error: " . $e->getMessage());
+    $stats = [];
+    $recent_appointments = [];
+    $appointments_change = 0;
 }
-
-// Redirect to new dashboard
-header("Location: /vehicare_db/admins/index.php");
-exit;
-
-// Get statistics
-$clientCount = $conn->query("SELECT COUNT(*) as count FROM clients")->fetch_assoc()['count'];
-$vehicleCount = $conn->query("SELECT COUNT(*) as count FROM vehicles")->fetch_assoc()['count'];
-$appointmentCount = $conn->query("SELECT COUNT(*) as count FROM appointments WHERE status = 'Pending'")->fetch_assoc()['count'];
-$revenueResult = $conn->query("SELECT SUM(grand_total) as total FROM invoices")->fetch_assoc();
-$totalRevenue = number_format($revenueResult['total'] ?? 0, 2);
-$totalServices = $conn->query("SELECT COUNT(*) as count FROM services")->fetch_assoc()['count'];
-$totalStaff = $conn->query("SELECT COUNT(*) as count FROM staff")->fetch_assoc()['count'];
-
 ?>
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VehiCare Admin Dashboard</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+<!-- Dashboard Content -->
+<div class="dashboard-content">
+    <!-- Welcome Section -->
+    <div class="welcome-section mb-30">
+        <div class="welcome-card">
+            <div class="welcome-content">
+                <h2>Welcome back, <?php echo htmlspecialchars($current_user['first_name']); ?>!</h2>
+                <p>Here's what's happening with your <?php echo $rbac->hasRole('admin') ? 'business' : 'assignments'; ?> today.</p>
+            </div>
+            <div class="welcome-actions">
+                <?php if ($rbac->hasPermission('create_appointments')): ?>
+                <a href="/vehicare_db/admins/walk_in_booking.php" class="btn btn-primary">
+                    <i class="fas fa-plus"></i>
+                    New Walk-in
+                </a>
+                <?php endif; ?>
+                <a href="/vehicare_db/admins/appointments.php" class="btn btn-outline-primary">
+                    <i class="fas fa-calendar"></i>
+                    View Schedule
+                </a>
+            </div>
+        </div>
+    </div>
 
-        body {
-            font-family: 'Poppins', sans-serif;
-            background: #f5f7fa;
-        }
+    <!-- Statistics Grid -->
+    <div class="stats-grid">
+        <?php if ($rbac->hasPermission('view_all_appointments')): ?>
+            <!-- Admin/Manager Dashboard -->
+            <div class="stat-card">
+                <div class="stat-card-header">
+                    <h3 class="stat-card-title">Total Appointments</h3>
+                    <div class="stat-card-icon" style="background: linear-gradient(135deg, #3498db, #2980b9);">
+                        <i class="fas fa-calendar-check"></i>
+                    </div>
+                </div>
+                <div class="stat-card-value" data-stat="total_appointments"><?php echo number_format($stats['total_appointments'] ?? 0); ?></div>
+                <div class="stat-card-change <?php echo $appointments_change >= 0 ? '' : 'negative'; ?>">
+                    <i class="fas fa-<?php echo $appointments_change >= 0 ? 'arrow-up' : 'arrow-down'; ?>"></i>
+                    <?php echo abs(round($appointments_change, 1)); ?>% from last month
+                </div>
+            </div>
 
-        .admin-wrapper {
-            display: flex;
-            min-height: 100vh;
-        }
+            <div class="stat-card">
+                <div class="stat-card-header">
+                    <h3 class="stat-card-title">Today's Appointments</h3>
+                    <div class="stat-card-icon" style="background: linear-gradient(135deg, #e74c3c, #c0392b);">
+                        <i class="fas fa-calendar-day"></i>
+                    </div>
+                </div>
+                <div class="stat-card-value" data-stat="today_appointments"><?php echo number_format($stats['today_appointments'] ?? 0); ?></div>
+                <div class="stat-card-change">
+                    <i class="fas fa-clock"></i>
+                    <?php echo ($stats['completed_today'] ?? 0); ?> completed
+                </div>
+            </div>
 
-        /* Sidebar Navigation */
-        .sidebar {
-            width: 220px;
-            background: linear-gradient(180deg, #dc143c 0%, #dc143c 100%);
-            position: fixed;
-            height: 100vh;
-            overflow-y: auto;
-            padding: 20px 0;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
-        }
+            <div class="stat-card">
+                <div class="stat-card-header">
+                    <h3 class="stat-card-title">Pending Appointments</h3>
+                    <div class="stat-card-icon" style="background: linear-gradient(135deg, #f39c12, #e67e22);">
+                        <i class="fas fa-hourglass-half"></i>
+                    </div>
+                </div>
+                <div class="stat-card-value" data-stat="pending_appointments"><?php echo number_format($stats['pending_appointments'] ?? 0); ?></div>
+                <div class="stat-card-change">
+                    <i class="fas fa-check-circle"></i>
+                    <?php echo ($stats['confirmed_appointments'] ?? 0); ?> confirmed
+                </div>
+            </div>
 
-        .sidebar-brand {
-            padding: 20px 15px;
-            text-align: center;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            margin-bottom: 20px;
-        }
+            <div class="stat-card">
+                <div class="stat-card-header">
+                    <h3 class="stat-card-title">Active Clients</h3>
+                    <div class="stat-card-icon" style="background: linear-gradient(135deg, #27ae60, #229954);">
+                        <i class="fas fa-users"></i>
+                    </div>
+                </div>
+                <div class="stat-card-value" data-stat="total_clients"><?php echo number_format($stats['total_clients'] ?? 0); ?></div>
+                <div class="stat-card-change">
+                    <i class="fas fa-car"></i>
+                    <?php echo ($stats['total_vehicles'] ?? 0); ?> vehicles
+                </div>
+            </div>
 
-        .sidebar-brand i {
-            font-size: 32px;
-            color: #fff;
-            display: block;
-            margin-bottom: 10px;
-        }
+        <?php else: ?>
+            <!-- Staff Dashboard -->
+            <div class="stat-card">
+                <div class="stat-card-header">
+                    <h3 class="stat-card-title">My Assignments</h3>
+                    <div class="stat-card-icon" style="background: linear-gradient(135deg, #3498db, #2980b9);">
+                        <i class="fas fa-tasks"></i>
+                    </div>
+                </div>
+                <div class="stat-card-value"><?php echo number_format($stats['my_assignments'] ?? 0); ?></div>
+                <div class="stat-card-change">
+                    <i class="fas fa-clock"></i>
+                    Total assignments
+                </div>
+            </div>
 
-        .sidebar-brand h5 {
-            color: #fff;
-            font-weight: 700;
-            margin: 0;
-            font-size: 16px;
-        }
+            <div class="stat-card">
+                <div class="stat-card-header">
+                    <h3 class="stat-card-title">Pending Work</h3>
+                    <div class="stat-card-icon" style="background: linear-gradient(135deg, #f39c12, #e67e22);">
+                        <i class="fas fa-hourglass-half"></i>
+                    </div>
+                </div>
+                <div class="stat-card-value"><?php echo number_format($stats['my_pending'] ?? 0); ?></div>
+                <div class="stat-card-change">
+                    <i class="fas fa-wrench"></i>
+                    Waiting to start
+                </div>
+            </div>
 
-        .sidebar-menu {
-            list-style: none;
-        }
+            <div class="stat-card">
+                <div class="stat-card-header">
+                    <h3 class="stat-card-title">In Progress</h3>
+                    <div class="stat-card-icon" style="background: linear-gradient(135deg, #e74c3c, #c0392b);">
+                        <i class="fas fa-cogs"></i>
+                    </div>
+                </div>
+                <div class="stat-card-value"><?php echo number_format($stats['my_in_progress'] ?? 0); ?></div>
+                <div class="stat-card-change">
+                    <i class="fas fa-play-circle"></i>
+                    Currently working
+                </div>
+            </div>
 
-        .sidebar-menu li {
-            margin: 0;
-        }
+            <div class="stat-card">
+                <div class="stat-card-header">
+                    <h3 class="stat-card-title">Completed Today</h3>
+                    <div class="stat-card-icon" style="background: linear-gradient(135deg, #27ae60, #229954);">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                </div>
+                <div class="stat-card-value"><?php echo number_format($stats['my_completed_today'] ?? 0); ?></div>
+                <div class="stat-card-change">
+                    <i class="fas fa-trophy"></i>
+                    Great work!
+                </div>
+            </div>
+        <?php endif; ?>
+    </div>
 
-        .sidebar-menu a {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 14px 20px;
-            color: rgba(255, 255, 255, 0.8);
+    <!-- Recent Activity -->
+    <div class="content-card">
+        <div class="card-header">
+            <h2 class="card-title">
+                <i class="fas fa-history"></i>
+                Recent Appointments
+            </h2>
+            <div class="card-actions">
+                <a href="/vehicare_db/admins/appointments.php" class="btn btn-outline-primary btn-sm">
+                    <i class="fas fa-eye"></i>
+                    View All
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            <?php if (!empty($recent_appointments)): ?>
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Client</th>
+                                <th>Vehicle</th>
+                                <th>Service</th>
+                                <th>Date & Time</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($recent_appointments as $appointment): ?>
+                            <tr data-id="<?php echo $appointment['id']; ?>">
+                                <td>
+                                    <div class="client-info">
+                                        <strong><?php echo htmlspecialchars($appointment['client_name']); ?></strong>
+                                        <?php if (isset($appointment['phone'])): ?>
+                                        <small class="text-muted d-block"><?php echo htmlspecialchars($appointment['phone']); ?></small>
+                                        <?php endif; ?>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="vehicle-info">
+                                        <?php echo htmlspecialchars($appointment['vehicle_info']); ?>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="service-name"><?php echo htmlspecialchars($appointment['service_name']); ?></span>
+                                </td>
+                                <td>
+                                    <div class="datetime-info">
+                                        <strong><?php echo date('M j, Y', strtotime($appointment['appointment_date'])); ?></strong>
+                                        <small class="text-muted d-block"><?php echo date('g:i A', strtotime($appointment['appointment_time'])); ?></small>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="badge badge-<?php 
+                                        echo $appointment['status'] === 'completed' ? 'success' : 
+                                            ($appointment['status'] === 'confirmed' ? 'info' : 
+                                            ($appointment['status'] === 'in-progress' ? 'primary' : 
+                                            ($appointment['status'] === 'cancelled' ? 'danger' : 'warning')));
+                                    ?>">
+                                        <?php echo htmlspecialchars(ucfirst($appointment['status'])); ?>
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <a href="/vehicare_db/admins/appointments.php?view=<?php echo $appointment['id']; ?>" 
+                                           class="btn btn-sm btn-outline-primary" data-tooltip="View Details">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <?php if ($appointment['status'] !== 'completed' && $appointment['status'] !== 'cancelled'): ?>
+                                            <?php if ($rbac->hasPermission('edit_appointments')): ?>
+                                            <button class="btn btn-sm btn-outline-secondary update-status-btn" 
+                                                    data-id="<?php echo $appointment['id']; ?>" 
+                                                    data-status="in-progress" 
+                                                    data-type="appointment"
+                                                    data-tooltip="Start Service">
+                                                <i class="fas fa-play"></i>
+                                            </button>
+                                            <?php endif; ?>
+                                        <?php endif; ?>
+                                    </div>
+                                </td>
+                            </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
+            <?php else: ?>
+                <div class="empty-state">
+                    <div class="empty-state-icon">
+                        <i class="fas fa-calendar-times"></i>
+                    </div>
+                    <h3>No Recent Appointments</h3>
+                    <p>No appointments found for your current role and permissions.</p>
+                    <?php if ($rbac->hasPermission('create_appointments')): ?>
+                    <a href="/vehicare_db/admins/walk_in_booking.php" class="btn btn-primary">
+                        <i class="fas fa-plus"></i>
+                        Create First Appointment
+                    </a>
+                    <?php endif; ?>
+                </div>
+            <?php endif; ?>
+        </div>
+    </div>
+
+    <!-- Charts Section -->
+    <?php if ($rbac->hasPermission('view_all_appointments')): ?>
+    <div class="charts-grid">
+        <div class="content-card">
+            <div class="card-header">
+                <h2 class="card-title">
+                    <i class="fas fa-chart-pie"></i>
+                    Appointments by Status
+                </h2>
+            </div>
+            <div class="card-body">
+                <canvas id="statusChart" width="400" height="300"></canvas>
+            </div>
+        </div>
+        
+        <div class="content-card">
+            <div class="card-header">
+                <h2 class="card-title">
+                    <i class="fas fa-chart-line"></i>
+                    Monthly Trend
+                </h2>
+            </div>
+            <div class="card-body">
+                <canvas id="trendChart" width="400" height="300"></canvas>
+            </div>
+        </div>
+        
+        <div class="content-card">
+            <div class="card-header">
+                <h2 class="card-title">
+                    <i class="fas fa-chart-bar"></i>
+                    Popular Services
+                </h2>
+            </div>
+            <div class="card-body">
+                <canvas id="servicesChart" width="400" height="300"></canvas>
+            </div>
+        </div>
+    </div>
+    <?php endif; ?>
+
+    <!-- Quick Actions Panel -->
+    <div class="content-card">
+        <div class="card-header">
+            <h2 class="card-title">
+                <i class="fas fa-bolt"></i>
+                Quick Actions
+            </h2>
+        </div>
+        <div class="card-body">
+            <div class="quick-actions-grid">
+                <?php if ($rbac->hasPermission('create_appointments')): ?>
+                <a href="/vehicare_db/admins/walk_in_booking.php" class="quick-action-item">
+                    <div class="quick-action-icon" style="background: #3498db;">
+                        <i class="fas fa-user-plus"></i>
+                    </div>
+                    <div class="quick-action-content">
+                        <h4>Walk-in Booking</h4>
+                        <p>Add new appointment for walk-in customer</p>
+                    </div>
+                </a>
+                <?php endif; ?>
+
+                <a href="/vehicare_db/admins/queue.php" class="quick-action-item">
+                    <div class="quick-action-icon" style="background: #e74c3c;">
+                        <i class="fas fa-list"></i>
+                    </div>
+                    <div class="quick-action-content">
+                        <h4>Service Queue</h4>
+                        <p>View and manage service queue</p>
+                    </div>
+                </a>
+
+                <?php if ($rbac->hasPermission('view_all_clients')): ?>
+                <a href="/vehicare_db/admins/clients.php" class="quick-action-item">
+                    <div class="quick-action-icon" style="background: #27ae60;">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="quick-action-content">
+                        <h4>Client Management</h4>
+                        <p>Add or edit client information</p>
+                    </div>
+                </a>
+                <?php endif; ?>
+
+                <?php if ($rbac->hasPermission('manage_inventory')): ?>
+                <a href="/vehicare_db/admins/inventory.php" class="quick-action-item">
+                    <div class="quick-action-icon" style="background: #f39c12;">
+                        <i class="fas fa-boxes"></i>
+                    </div>
+                    <div class="quick-action-content">
+                        <h4>Inventory</h4>
+                        <p>Check parts and supplies</p>
+                    </div>
+                </a>
+                <?php endif; ?>
+
+                <?php if ($rbac->hasPermission('generate_reports')): ?>
+                <a href="/vehicare_db/admins/reports.php" class="quick-action-item">
+                    <div class="quick-action-icon" style="background: #9b59b6;">
+                        <i class="fas fa-chart-bar"></i>
+                    </div>
+                    <div class="quick-action-content">
+                        <h4>Reports</h4>
+                        <p>Generate business reports</p>
+                    </div>
+                </a>
+                <?php endif; ?>
+
+                <a href="/vehicare_db/admins/notifications.php" class="quick-action-item">
+                    <div class="quick-action-icon" style="background: #e67e22;">
+                        <i class="fas fa-bell"></i>
+                    </div>
+                    <div class="quick-action-content">
+                        <h4>Notifications</h4>
+                        <p>View all notifications and alerts</p>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Dashboard-specific styles */
+.welcome-card {
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+    color: var(--white);
+    padding: 30px;
+    border-radius: var(--border-radius);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 30px;
+}
+
+.welcome-content h2 {
+    font-size: var(--font-size-2xl);
+    font-weight: 600;
+    margin: 0 0 8px;
+}
+
+.welcome-content p {
+    margin: 0;
+    opacity: 0.9;
+}
+
+.welcome-actions {
+    display: flex;
+    gap: 15px;
+    flex-shrink: 0;
+}
+
+.welcome-actions .btn {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.3);
+    color: var(--white);
+}
+
+.welcome-actions .btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    color: var(--white);
+}
+
+.quick-actions-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+}
+
+.quick-action-item {
+    display: flex;
+    align-items: center;
+    padding: 20px;
+    background: var(--white);
+    border: 2px solid var(--gray-200);
+    border-radius: var(--border-radius);
+    text-decoration: none;
+    color: inherit;
+    transition: var(--transition);
+}
+
+.quick-action-item:hover {
+    border-color: var(--primary-color);
+    transform: translateY(-2px);
+    box-shadow: var(--box-shadow-hover);
+    text-decoration: none;
+    color: inherit;
+}
+
+.quick-action-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--white);
+    font-size: 1.3rem;
+    margin-right: 15px;
+    flex-shrink: 0;
+}
+
+.quick-action-content h4 {
+    font-size: var(--font-size-base);
+    font-weight: 600;
+    margin: 0 0 5px;
+    color: var(--gray-800);
+}
+
+.quick-action-content p {
+    font-size: var(--font-size-sm);
+    color: var(--gray-500);
+    margin: 0;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 40px 20px;
+}
+
+.empty-state-icon {
+    font-size: 4rem;
+    color: var(--gray-300);
+    margin-bottom: 20px;
+}
+
+.empty-state h3 {
+    font-size: var(--font-size-xl);
+    color: var(--gray-600);
+    margin-bottom: 10px;
+}
+
+.empty-state p {
+    color: var(--gray-500);
+    margin-bottom: 25px;
+}
+
+.client-info, .vehicle-info, .datetime-info {
+    line-height: 1.4;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 5px;
+}
+
+.charts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 25px;
+    margin-bottom: 30px;
+}
+
+.chart-container {
+    position: relative;
+    height: 300px;
+}
+
+@media (max-width: 768px) {
+    .welcome-card {
+        flex-direction: column;
+        text-align: center;
+        gap: 20px;
+    }
+    
+    .welcome-actions {
+        justify-content: center;
+    }
+    
+    .quick-actions-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .charts-grid {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+
+<script>
+// Add dashboard-specific class to body
+document.body.classList.add('dashboard-page');
+</script>
+
+<?php
+// Additional JavaScript for dashboard
+$additional_js = [
+    '/vehicare_db/assets/js/dashboard-charts.js'
+];
+
+// Include the admin footer
+include_once __DIR__ . '/../app/views/layouts/admin_footer.php';
+?>
             text-decoration: none;
             transition: all 0.3s ease;
             border-left: 3px solid transparent;

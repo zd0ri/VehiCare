@@ -8,7 +8,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
 }
 
 $assignments = $conn->query("
-    SELECT a.*, u.full_name as client_name, s.staff_name, st.service_name
+    SELECT a.*, u.full_name as client_name, s.full_name as staff_name, st.service_name
     FROM assignments a
     JOIN appointments ap ON a.appointment_id = ap.appointment_id
     JOIN users u ON ap.client_id = u.user_id
@@ -16,9 +16,75 @@ $assignments = $conn->query("
     JOIN services st ON ap.service_id = st.service_id
     ORDER BY a.assigned_date DESC
 ");
+
+$page_title = "Assignments";
+$page_icon = "fas fa-tasks";
+include __DIR__ . '/includes/admin_layout_header.php';
 ?>
-<!DOCTYPE html>
-<html lang="en">
+
+<!-- Page Content -->
+<div class="content-card">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3>Assignment Management</h3>
+        <button class="btn btn-primary" onclick="alert('Add Assignment feature coming soon')">
+            <i class="fas fa-plus"></i> New Assignment
+        </button>
+    </div>
+    
+    <div class="table-responsive">
+        <table class="table table-striped data-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Client</th>
+                    <th>Staff Member</th>
+                    <th>Service</th>
+                    <th>Assigned Date</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php if ($assignments && $assignments->num_rows > 0): ?>
+                    <?php while($assignment = $assignments->fetch_assoc()): ?>
+                    <tr>
+                        <td><?php echo $assignment['assignment_id']; ?></td>
+                        <td><?php echo htmlspecialchars($assignment['client_name'] ?? 'N/A'); ?></td>
+                        <td><?php echo htmlspecialchars($assignment['staff_name'] ?? 'N/A'); ?></td>
+                        <td><?php echo htmlspecialchars($assignment['service_name'] ?? 'N/A'); ?></td>
+                        <td><?php echo htmlspecialchars($assignment['assigned_date'] ?? 'N/A'); ?></td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-primary" onclick="editAssignment(<?php echo $assignment['assignment_id']; ?>)">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger" onclick="deleteAssignment(<?php echo $assignment['assignment_id']; ?>)">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    <?php endwhile; ?>
+                <?php else: ?>
+                    <tr>
+                        <td colspan="6" class="text-center">No assignments found</td>
+                    </tr>
+                <?php endif; ?>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+function editAssignment(id) {
+    alert('Edit assignment ' + id);
+}
+
+function deleteAssignment(id) {
+    if (confirm('Are you sure you want to delete this assignment?')) {
+        alert('Delete assignment ' + id);
+    }
+}
+</script>
+
+<?php include __DIR__ . '/includes/admin_layout_footer.php'; ?>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">

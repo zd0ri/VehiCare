@@ -3,75 +3,76 @@ session_start();
 require_once __DIR__ . '/../includes/config.php';
 
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
-    header("Location: /vehicare_db/index.php");
+    header("Location: /vehicare_db/login.php");
     exit;
 }
 
-include __DIR__ . '/../includes/adminHeader.php';
-
 // Fetch staff
 $staffQuery = $conn->query("SELECT * FROM staff ORDER BY staff_id DESC");
+
+$page_title = "Staff";
+$page_icon = "fas fa-user-tie";
+include __DIR__ . '/includes/admin_layout_header.php';
 ?>
 
-<div class="admin-sidebar-shared">
-  <div class="list-group">
-    <a href="/vehicare_db/admins/dashboard.php" class="list-group-item">
-      <i class="fas fa-chart-line"></i> Dashboard
-    </a>
-    <a href="/vehicare_db/admins/staff.php" class="list-group-item active">
-      <i class="fas fa-people-group"></i> Staff
-    </a>
-    <a href="/vehicare_db/admins/payments.php" class="list-group-item">
-      <i class="fas fa-money-bill"></i> Payments
-    </a>
-  </div>
+<!-- Page Content -->
+<div class="content-card">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3>Staff Management</h3>
+        <button class="btn btn-primary" onclick="alert('Add staff feature coming soon')">
+            <i class="fas fa-plus"></i> Add New Staff
+        </button>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-striped data-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Full Name</th>
+                    <th>Position</th>
+                    <th>Contact</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php if ($staffQuery && $staffQuery->num_rows > 0): ?>
+                    <?php while($staff = $staffQuery->fetch_assoc()): ?>
+                    <tr>
+                        <td>#<?php echo $staff['staff_id']; ?></td>
+                        <td><?php echo htmlspecialchars($staff['full_name']); ?></td>
+                        <td><?php echo htmlspecialchars($staff['position']); ?></td>
+                        <td><?php echo htmlspecialchars($staff['contact']); ?></td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-primary" onclick="editStaff(<?php echo $staff['staff_id']; ?>)">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger" onclick="deleteStaff(<?php echo $staff['staff_id']; ?>)">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    <?php endwhile; ?>
+                <?php else: ?>
+                    <tr>
+                        <td colspan="5" class="text-center">No staff members found</td>
+                    </tr>
+                <?php endif; ?>
+            </tbody>
+        </table>
+    </div>
 </div>
 
-<div class="admin-main-content">
-  <h1 style="color: #1a1a1a; margin-bottom: 20px;">Manage Staff</h1>
-  
-  <div class="table-container">
-    <div class="table-header">
-      <h3>All Staff Members</h3>
-      <button class="btn btn-primary btn-sm" onclick="alert('Add Staff feature coming soon')"><i class="fas fa-plus"></i> Add Staff</button>
-    </div>
-    <div style="overflow-x: auto;">
-      <table class="table">
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Full Name</th>
-            <th>Position</th>
-            <th>Contact</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          <?php
-          if ($staffQuery && $staffQuery->num_rows > 0) {
-            while ($staff = $staffQuery->fetch_assoc()) {
-              echo "<tr>
-                <td>#{$staff['staff_id']}</td>
-                <td>{$staff['full_name']}</td>
-                <td>{$staff['position']}</td>
-                <td>{$staff['contact']}</td>
-                <td>
-                  <div class='action-buttons'>
-                    <button class='btn btn-primary btn-sm'>Edit</button>
-                    <button class='btn btn-danger btn-sm'>Delete</button>
-                  </div>
-                </td>
-              </tr>";
-            }
-          } else {
-            echo "<tr><td colspan='5' style='text-align: center; padding: 20px;'>No staff members found</td></tr>";
-          }
-          ?>
-        </tbody>
-      </table>
-    </div>
-  </div>
+<script>
+function editStaff(id) {
+    alert('Edit staff ' + id);
+}
 
-</div>
+function deleteStaff(id) {
+    if (confirm('Are you sure you want to delete this staff member?')) {
+        alert('Delete staff ' + id);
+    }
+}
+</script>
 
-<?php include __DIR__ . '/../includes/footer.php'; ?>
+<?php include __DIR__ . '/includes/admin_layout_footer.php'; ?>

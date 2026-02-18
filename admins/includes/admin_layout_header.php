@@ -1,6 +1,6 @@
 <?php
 /**
- * Admin Layout Template
+ * Admin Layout Header Template
  * Include this file to use consistent admin layout across all pages
  * 
  * Usage:
@@ -29,279 +29,286 @@ if (!isset($page_icon)) {
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --teal-color: #dc143c;
+            --teal-dark: #a01030;
+            --primary: #dc143c;
+            --secondary: #a01030;
+        }
+        
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-
+        
         body {
             font-family: 'Poppins', sans-serif;
             background: #f5f7fa;
         }
-
-        .admin-wrapper {
+        
+        .admin-container {
             display: flex;
             min-height: 100vh;
         }
-
-        /* Sidebar Navigation */
+        
+        /* Sidebar */
         .sidebar {
-            width: 220px;
-            background: linear-gradient(180deg, #dc143c 0%, #dc143c 100%);
+            width: 280px;
+            background: linear-gradient(135deg, var(--teal-dark) 0%, var(--teal-color) 100%);
+            color: #fff;
+            padding: 20px 0;
             position: fixed;
             height: 100vh;
             overflow-y: auto;
-            padding: 20px 0;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
-            left: 0;
-            top: 0;
-            z-index: 1000;
+            box-shadow: 2px 0 8px rgba(0,0,0,0.1);
         }
-
-        .sidebar-brand {
-            padding: 20px 15px;
-            text-align: center;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        
+        .sidebar-header {
+            padding: 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
             margin-bottom: 20px;
+            text-align: center;
         }
-
-        .sidebar-brand i {
-            font-size: 32px;
-            color: #fff;
-            display: block;
-            margin-bottom: 10px;
-        }
-
-        .sidebar-brand h5 {
-            color: #fff;
-            font-weight: 700;
+        
+        .sidebar-header h3 {
             margin: 0;
-            font-size: 16px;
+            font-size: 1.3rem;
+            font-weight: 700;
         }
-
+        
         .sidebar-menu {
             list-style: none;
         }
-
+        
         .sidebar-menu li {
             margin: 0;
         }
-
+        
+        .sidebar-menu .menu-section {
+            padding: 10px 20px 5px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: rgba(255,255,255,0.6);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 15px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 5px;
+        }
+        
         .sidebar-menu a {
             display: flex;
             align-items: center;
-            gap: 12px;
-            padding: 14px 20px;
-            color: rgba(255, 255, 255, 0.8);
+            padding: 12px 20px;
+            color: rgba(255,255,255,0.8);
             text-decoration: none;
             transition: all 0.3s ease;
             border-left: 3px solid transparent;
         }
-
+        
         .sidebar-menu a:hover,
         .sidebar-menu a.active {
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(255,255,255,0.1);
             color: #fff;
-            border-left-color: #a01030;
+            border-left-color: rgba(255,255,255,0.8);
         }
-
+        
         .sidebar-menu i {
-            font-size: 18px;
-            width: 20px;
+            width: 24px;
+            margin-right: 12px;
+            text-align: center;
         }
-
+        
         /* Main Content */
         .main-content {
-            margin-left: 220px;
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-        }
-
-        /* Header */
-        .admin-header {
-            background: #fff;
-            padding: 20px 30px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid #e0e0e0;
-        }
-
-        .header-left h2 {
-            margin: 0;
-            color: #333;
-            font-weight: 700;
-            font-size: 24px;
-        }
-
-        .header-right {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-        }
-
-        .header-time {
-            font-size: 14px;
-            color: #666;
-            font-weight: 500;
-        }
-
-        .header-user {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 8px 15px;
-            background: #f0f0f0;
-            border-radius: 20px;
-            cursor: pointer;
-        }
-
-        .header-user i {
-            width: 30px;
-            height: 30px;
-            background: #dc143c;
-            color: white;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 14px;
-        }
-
-        /* Content Area */
-        .content-area {
-            flex: 1;
+            margin-left: 280px;
             padding: 30px;
-            overflow-y: auto;
+            width: calc(100% - 280px);
         }
-
-        /* Card Styles */
-        .admin-card {
-            background: white;
-            border-radius: 10px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-            border: 1px solid #e0e0e0;
-            padding: 20px;
-            margin-bottom: 20px;
-        }
-
-        .card-header {
+        
+        /* Top Header */
+        .top-header {
+            background: #fff;
+            padding: 15px 30px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
-            padding-bottom: 15px;
-            border-bottom: 1px solid #e0e0e0;
         }
-
-        .card-header h3 {
+        
+        .top-header h1 {
             margin: 0;
-            color: #333;
+            color: var(--teal-dark);
+            font-size: 1.8rem;
             font-weight: 700;
-            font-size: 18px;
         }
-
-        .card-header-link {
-            color: #dc143c;
-            text-decoration: none;
-            font-size: 12px;
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .user-info img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+        }
+        
+        /* Content Cards */
+        .content-card {
+            background: #fff;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            margin-bottom: 20px;
+        }
+        
+        .content-card h3 {
+            color: var(--teal-dark);
+            margin-bottom: 20px;
             font-weight: 600;
         }
-
-        /* Table Styles */
-        .admin-table {
-            width: 100%;
-            border-collapse: collapse;
+        
+        /* Tables */
+        .data-table {
+            background: #fff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
         }
-
-        .admin-table thead {
-            background: #f5f7fa;
-            border-bottom: 2px solid #e0e0e0;
+        
+        .data-table thead {
+            background: linear-gradient(135deg, var(--teal-dark) 0%, var(--teal-color) 100%);
+            color: #fff;
         }
-
-        .admin-table thead th {
-            color: #666;
-            font-weight: 600;
-            padding: 14px 16px;
-            text-align: left;
-            font-size: 12px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+        
+        .data-table tbody tr:hover {
+            background: #f8f9fa;
         }
-
-        .admin-table tbody td {
-            padding: 14px 16px;
-            border-bottom: 1px solid #e0e0e0;
-            font-size: 13px;
-            color: #333;
+        
+        /* Buttons */
+        .btn-primary {
+            background: var(--primary);
+            border-color: var(--primary);
         }
-
-        .admin-table tbody tr:hover {
-            background: #f9f9f9;
+        
+        .btn-primary:hover {
+            background: var(--secondary);
+            border-color: var(--secondary);
         }
-
+        
+        .btn-outline-primary {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+        
+        .btn-outline-primary:hover {
+            background: var(--primary);
+            border-color: var(--primary);
+        }
+        
+        /* Form Controls */
+        .form-control:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 0.2rem rgba(220, 20, 60, 0.25);
+        }
+        
+        /* Alerts */
+        .alert-success {
+            border-left: 4px solid #28a745;
+        }
+        
+        .alert-danger {
+            border-left: 4px solid #dc3545;
+        }
+        
+        .alert-warning {
+            border-left: 4px solid #ffc107;
+        }
+        
+        .alert-info {
+            border-left: 4px solid #17a2b8;
+        }
+        
         /* Responsive */
         @media (max-width: 768px) {
             .sidebar {
-                width: 0;
-                position: absolute;
+                width: 100%;
+                height: auto;
+                position: relative;
+                margin-bottom: 20px;
             }
-
+            
             .main-content {
                 margin-left: 0;
+                width: 100%;
+                padding: 15px;
             }
-
-            .admin-header {
+            
+            .top-header {
                 flex-direction: column;
                 gap: 15px;
-            }
-
-            .content-area {
-                padding: 15px;
+                text-align: center;
             }
         }
     </style>
 </head>
 <body>
-    <div class="admin-wrapper">
-        <!-- Sidebar -->
+    <div class="admin-container">
+        <!-- Sidebar Navigation -->
         <aside class="sidebar">
-            <div class="sidebar-brand">
-                <i class="fas fa-car"></i>
-                <h5>VehiCare</h5>
+            <div class="sidebar-header">
+                <h3><i class="fas fa-car me-2"></i>VehiCare</h3>
+                <small>Admin Panel</small>
             </div>
+            
             <ul class="sidebar-menu">
-                <li><a href="/vehicare_db/admins/dashboard.php"><i class="fas fa-chart-line"></i> Dashboard</a></li>
-                <li><a href="/vehicare_db/admins/users.php"><i class="fas fa-users"></i> Users</a></li>
-                <li><a href="/vehicare_db/admins/clients.php"><i class="fas fa-user-tie"></i> Clients</a></li>
-                <li><a href="/vehicare_db/admins/vehicles.php"><i class="fas fa-car"></i> Vehicles</a></li>
-                <li><a href="/vehicare_db/admins/appointments.php"><i class="fas fa-calendar"></i> Appointments</a></li>
-                <li><a href="/vehicare_db/admins/services.php"><i class="fas fa-cogs"></i> Services</a></li>
-                <li><a href="/vehicare_db/admins/staff.php"><i class="fas fa-people-group"></i> Staff</a></li>
-                <li><a href="/vehicare_db/admins/parts.php"><i class="fas fa-box"></i> Parts</a></li>
-                <li><a href="/vehicare_db/admins/payments.php"><i class="fas fa-money-bill"></i> Payments</a></li>
-                <li><a href="/vehicare_db/logout.php"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+                <li><a href="/vehicare_db/admins/index.php" class="<?php echo basename($_SERVER['PHP_SELF']) == 'index.php' ? 'active' : ''; ?>"><i class="fas fa-dashboard"></i>Dashboard</a></li>
+                
+                <li class="menu-section">BOOKINGS</li>
+                <li><a href="/vehicare_db/admins/appointments.php" class="<?php echo basename($_SERVER['PHP_SELF']) == 'appointments.php' ? 'active' : ''; ?>"><i class="fas fa-calendar"></i>Appointments</a></li>
+                <li><a href="/vehicare_db/admins/walk_in_booking.php" class="<?php echo basename($_SERVER['PHP_SELF']) == 'walk_in_booking.php' ? 'active' : ''; ?>"><i class="fas fa-door-open"></i>Walk-In Bookings</a></li>
+                
+                <li class="menu-section">MANAGEMENT</li>
+                <li><a href="/vehicare_db/admins/clients.php" class="<?php echo basename($_SERVER['PHP_SELF']) == 'clients.php' ? 'active' : ''; ?>"><i class="fas fa-users"></i>Clients</a></li>
+                <li><a href="/vehicare_db/admins/vehicles.php" class="<?php echo basename($_SERVER['PHP_SELF']) == 'vehicles.php' ? 'active' : ''; ?>"><i class="fas fa-car"></i>Vehicles</a></li>
+                <li><a href="/vehicare_db/admins/technicians.php" class="<?php echo basename($_SERVER['PHP_SELF']) == 'technicians.php' ? 'active' : ''; ?>"><i class="fas fa-tools"></i>Technicians</a></li>
+                <li><a href="/vehicare_db/admins/assignments.php" class="<?php echo basename($_SERVER['PHP_SELF']) == 'assignments.php' ? 'active' : ''; ?>"><i class="fas fa-tasks"></i>Assignments</a></li>
+                
+                <li class="menu-section">OPERATIONS</li>
+                <li><a href="/vehicare_db/admins/queue.php" class="<?php echo basename($_SERVER['PHP_SELF']) == 'queue.php' ? 'active' : ''; ?>"><i class="fas fa-list-ol"></i>Queue</a></li>
+                <li><a href="/vehicare_db/admins/inventory.php" class="<?php echo basename($_SERVER['PHP_SELF']) == 'inventory.php' ? 'active' : ''; ?>"><i class="fas fa-boxes"></i>Inventory</a></li>
+                <li><a href="/vehicare_db/admins/services.php" class="<?php echo basename($_SERVER['PHP_SELF']) == 'services.php' ? 'active' : ''; ?>"><i class="fas fa-wrench"></i>Services</a></li>
+                
+                <li class="menu-section">FINANCIAL</li>
+                <li><a href="/vehicare_db/admins/payments.php" class="<?php echo basename($_SERVER['PHP_SELF']) == 'payments.php' ? 'active' : ''; ?>"><i class="fas fa-credit-card"></i>Payments</a></li>
+                <li><a href="/vehicare_db/admins/invoices.php" class="<?php echo basename($_SERVER['PHP_SELF']) == 'invoices.php' ? 'active' : ''; ?>"><i class="fas fa-receipt"></i>Invoices</a></li>
+                
+                <li class="menu-section">REPORTS & SYSTEM</li>
+                <li><a href="/vehicare_db/admins/ratings.php" class="<?php echo basename($_SERVER['PHP_SELF']) == 'ratings.php' ? 'active' : ''; ?>"><i class="fas fa-star"></i>Ratings</a></li>
+                <li><a href="/vehicare_db/admins/notifications.php" class="<?php echo basename($_SERVER['PHP_SELF']) == 'notifications.php' ? 'active' : ''; ?>"><i class="fas fa-bell"></i>Notifications</a></li>
+                <li><a href="/vehicare_db/admins/audit_logs.php" class="<?php echo basename($_SERVER['PHP_SELF']) == 'audit_logs.php' ? 'active' : ''; ?>"><i class="fas fa-history"></i>Audit Logs</a></li>
+                
+                <li style="border-top: 1px solid rgba(255,255,255,0.1); margin-top: 20px; padding-top: 20px;">
+                    <a href="/vehicare_db/logout.php"><i class="fas fa-sign-out-alt"></i>Logout</a>
+                </li>
             </ul>
         </aside>
-
-        <!-- Main Content -->
-        <div class="main-content">
-            <!-- Header -->
-            <header class="admin-header">
-                <div class="header-left">
-                    <h2><i class="<?php echo $page_icon; ?>"></i> <?php echo htmlspecialchars($page_title); ?></h2>
+        
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Top Header -->
+            <div class="top-header">
+                <h1><i class="<?php echo $page_icon; ?> me-2"></i><?php echo htmlspecialchars($page_title); ?></h1>
+                <div class="user-info">
+                    <span><?php echo htmlspecialchars($_SESSION['email'] ?? 'Administrator'); ?></span>
+                    <a href="/vehicare_db/logout.php" class="btn btn-outline-danger btn-sm">
+                        <i class="fas fa-sign-out-alt"></i>
+                    </a>
                 </div>
-                <div class="header-right">
-                    <span class="header-time" id="current-time">09:55</span>
-                    <div class="header-user">
-                        <i class="fas fa-bell"></i>
-                        <i class="fas fa-user"></i>
-                    </div>
-                </div>
-            </header>
-
-            <!-- Content -->
-            <div class="content-area">
+            </div>
+            <!-- Page content goes after this point -->

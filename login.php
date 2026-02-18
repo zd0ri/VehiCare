@@ -1,13 +1,17 @@
 <?php
 session_start();
-require_once __DIR__ . '/includes/config.php';
+require_once __DIR__ . '/config/database.php';
+require_once __DIR__ . '/app/helpers/auth_helpers.php';
 
 // Check if already logged in
-if (isset($_SESSION['user_id'])) {
-    if ($_SESSION['role'] === 'admin') {
+if (checkAuth(false)) {
+    $userRole = getUserRole();
+    if ($userRole === 'admin') {
         header("Location: /vehicare_db/admins/dashboard.php");
+    } elseif ($userRole === 'staff') {
+        header("Location: /vehicare_db/staff/dashboard.php");
     } else {
-        header("Location: /vehicare_db/dashboard.php");
+        header("Location: /vehicare_db/client/dashboard.php");
     }
     exit;
 }
@@ -33,43 +37,29 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 
     if (empty($errors)) {
-        // Query users table for credentials
-        $email_escaped = $conn->real_escape_string($email);
-        $query = "SELECT * FROM users WHERE email = '$email_escaped' LIMIT 1";
-        $result = $conn->query($query);
-
-        if ($result && $result->num_rows > 0) {
-            $user = $result->fetch_assoc();
+        // Use Auth class for authentication
+        require_once __DIR__ . '/app/middleware/Auth.php';
+        $auth = new Auth($pdo);
+        
+        $login_result = $auth->login($email, $password, isset($_POST['remember']));
+        
+        if ($login_result['success']) {
+            // Set user role in session for helper functions
+            $_SESSION['user_role'] = $login_result['user']['role'];
+            $_SESSION['user_data'] = $login_result['user'];
             
-            // Check if user is active
-            if ($user['status'] !== 'active') {
-                $errors[] = "Your account is inactive. Please contact administration.";
-            } elseif (password_verify($password, $user['password'])) {
-                // Update last login timestamp
-                $update_login = "UPDATE users SET last_login = NOW() WHERE user_id = " . $user['user_id'];
-                $conn->query($update_login);
-
-                // Set session variables
-                $_SESSION['user_id'] = $user['user_id'];
-                $_SESSION['email'] = $user['email'];
-                $_SESSION['username'] = $user['username'];
-                $_SESSION['role'] = $user['role'];
-                $_SESSION['full_name'] = $user['full_name'];
-
-                // Redirect based on role
-                if ($user['role'] === 'admin') {
-                    header("Location: /vehicare_db/admins/dashboard.php");
-                } elseif ($user['role'] === 'staff') {
-                    header("Location: /vehicare_db/staff/dashboard.php");
-                } else {
-                    header("Location: /vehicare_db/client/dashboard.php");
-                }
-                exit;
+            // Redirect based on role
+            $role = $login_result['user']['role'];
+            if ($role === 'admin') {
+                header("Location: /vehicare_db/admins/dashboard.php");
+            } elseif ($role === 'staff') {
+                header("Location: /vehicare_db/staff/dashboard.php");
             } else {
-                $errors[] = "Invalid email or password.";
+                header("Location: /vehicare_db/client/dashboard.php");
             }
+            exit;
         } else {
-            $errors[] = "Invalid email or password.";
+            $errors[] = $login_result['message'];
         }
     }
 

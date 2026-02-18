@@ -27,13 +27,21 @@ $recent_appointments = $conn->query("
     ORDER BY a.appointment_date DESC LIMIT 5
 ");
 
-// Get recent notifications
-$notifications = @$conn->query("
-    SELECT * FROM audittrail 
-    ORDER BY action_date DESC LIMIT 5
-");
-if (!$notifications) {
-    $notifications = null;
+// Get recent notifications - use audittrail as fallback if notifications table doesn't exist
+try {
+    $notifications = $conn->query("
+        SELECT * FROM notifications 
+        ORDER BY created_at DESC LIMIT 5
+    ");
+} catch (Exception $e) {
+    // Fallback to audit trail
+    $notifications = $conn->query("
+        SELECT log_id as notification_id, action as title, 
+               CONCAT('Action performed by staff ID ', staff_id) as message,
+               action_date as created_at
+        FROM audittrail 
+        ORDER BY action_date DESC LIMIT 5
+    ");
 }
 ?>
 <!DOCTYPE html>
@@ -96,6 +104,18 @@ if (!$notifications) {
         
         .sidebar-menu {
             list-style: none;
+        }
+        
+        .sidebar-menu .menu-section {
+            padding: 10px 20px 5px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: rgba(255,255,255,0.6);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 15px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 5px;
         }
         
         .sidebar-menu li {
@@ -257,32 +277,28 @@ if (!$notifications) {
             <ul class="sidebar-menu">
                 <li><a href="/vehicare_db/admins/index.php" class="active"><i class="fas fa-dashboard"></i>Dashboard</a></li>
                 
+                <li class="menu-section">BOOKINGS</li>
                 <li><a href="/vehicare_db/admins/appointments.php"><i class="fas fa-calendar"></i>Appointments</a></li>
-                
                 <li><a href="/vehicare_db/admins/walk_in_booking.php"><i class="fas fa-door-open"></i>Walk-In Bookings</a></li>
                 
+                <li class="menu-section">MANAGEMENT</li>
                 <li><a href="/vehicare_db/admins/clients.php"><i class="fas fa-users"></i>Clients</a></li>
-                
                 <li><a href="/vehicare_db/admins/vehicles.php"><i class="fas fa-car"></i>Vehicles</a></li>
-                
                 <li><a href="/vehicare_db/admins/technicians.php"><i class="fas fa-tools"></i>Technicians</a></li>
-                
                 <li><a href="/vehicare_db/admins/assignments.php"><i class="fas fa-tasks"></i>Assignments</a></li>
                 
-                <li><a href="/vehicare_db/admins/queue.php"><i class="fas fa-list-ol"></i>Queue Management</a></li>
-                
+                <li class="menu-section">OPERATIONS</li>
+                <li><a href="/vehicare_db/admins/queue.php"><i class="fas fa-list-ol"></i>Queue</a></li>
+                <li><a href="/vehicare_db/admins/inventory.php"><i class="fas fa-boxes"></i>Inventory</a></li>
                 <li><a href="/vehicare_db/admins/services.php"><i class="fas fa-wrench"></i>Services</a></li>
                 
-                <li><a href="/vehicare_db/admins/inventory.php"><i class="fas fa-boxes"></i>Inventory</a></li>
-                
+                <li class="menu-section">FINANCIAL</li>
                 <li><a href="/vehicare_db/admins/payments.php"><i class="fas fa-credit-card"></i>Payments</a></li>
-                
                 <li><a href="/vehicare_db/admins/invoices.php"><i class="fas fa-receipt"></i>Invoices</a></li>
                 
-                <li><a href="/vehicare_db/admins/ratings.php"><i class="fas fa-star"></i>Ratings & Reports</a></li>
-                
+                <li class="menu-section">REPORTS & SYSTEM</li>
+                <li><a href="/vehicare_db/admins/ratings.php"><i class="fas fa-star"></i>Ratings</a></li>
                 <li><a href="/vehicare_db/admins/notifications.php"><i class="fas fa-bell"></i>Notifications</a></li>
-                
                 <li><a href="/vehicare_db/admins/audit_logs.php"><i class="fas fa-history"></i>Audit Logs</a></li>
                 
                 <li style="border-top: 1px solid rgba(255,255,255,0.1); margin-top: 20px; padding-top: 20px;">
@@ -425,15 +441,15 @@ if (!$notifications) {
                                     <?php while ($notif = $notifications->fetch_assoc()): ?>
                                     <tr>
                                         <td>
-                                            <strong><?php echo htmlspecialchars($notif['title']); ?></strong><br>
-                                            <small class="text-muted"><?php echo htmlspecialchars(substr($notif['message'], 0, 50)); ?>...</small>
+                                            <strong><?php echo htmlspecialchars($notif['title'] ?? $notif['action'] ?? 'System Action'); ?></strong><br>
+                                            <small class="text-muted"><?php echo htmlspecialchars(substr($notif['message'] ?? $notif['action'] ?? 'No description', 0, 50)); ?>...</small>
                                         </td>
-                                        <td><small><?php echo date('M d, h:i A', strtotime($notif['created_at'])); ?></small></td>
+                                        <td><small><?php echo date('M d, h:i A', strtotime($notif['created_at'] ?? $notif['action_date'] ?? 'now')); ?></small></td>
                                     </tr>
                                     <?php endwhile; ?>
                                 <?php else: ?>
                                     <tr>
-                                        <td colspan="2" class="text-center text-muted py-4">No notifications</td>
+                                        <td colspan="2" class="text-center text-muted py-4">No recent activity</td>
                                     </tr>
                                 <?php endif; ?>
                             </tbody>

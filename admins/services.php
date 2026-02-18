@@ -3,81 +3,76 @@ session_start();
 require_once __DIR__ . '/../includes/config.php';
 
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
-    header("Location: /vehicare_db/index.php");
+    header("Location: /vehicare_db/login.php");
     exit;
 }
 
-include __DIR__ . '/../includes/adminHeader.php';
+// Fetch all services
+$servicesQuery = $conn->query("SELECT * FROM services ORDER BY service_name");
 
-// Fetch services
-$servicesQuery = $conn->query("SELECT * FROM services ORDER BY service_id DESC");
+$page_title = "Services";
+$page_icon = "fas fa-wrench";
+include __DIR__ . '/includes/admin_layout_header.php';
 ?>
 
-<div class="admin-sidebar-shared">
-  <div class="list-group">
-    <a href="/vehicare_db/admins/dashboard.php" class="list-group-item">
-      <i class="fas fa-chart-line"></i> Dashboard
-    </a>
-    <a href="/vehicare_db/admins/clients.php" class="list-group-item">
-      <i class="fas fa-users"></i> Clients
-    </a>
-    <a href="/vehicare_db/admins/vehicles.php" class="list-group-item">
-      <i class="fas fa-car"></i> Vehicles
-    </a>
-    <a href="/vehicare_db/admins/appointments.php" class="list-group-item">
-      <i class="fas fa-calendar"></i> Appointments
-    </a>
-    <a href="/vehicare_db/admins/services.php" class="list-group-item active">
-      <i class="fas fa-cogs"></i> Services
-    </a>
-  </div>
+<!-- Page Content -->
+<div class="content-card">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3>Service Management</h3>
+        <button class="btn btn-primary" onclick="alert('Add Service feature coming soon')">
+            <i class="fas fa-plus"></i> Add Service
+        </button>
+    </div>
+    
+    <div class="table-responsive">
+        <table class="table table-striped data-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Service Name</th>
+                    <th>Description</th>
+                    <th>Price</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php if ($servicesQuery && $servicesQuery->num_rows > 0): ?>
+                    <?php while($service = $servicesQuery->fetch_assoc()): ?>
+                    <tr>
+                        <td><?php echo $service['service_id']; ?></td>
+                        <td><?php echo htmlspecialchars($service['service_name'] ?? 'N/A'); ?></td>
+                        <td><?php echo htmlspecialchars(substr($service['description'] ?? 'N/A', 0, 50)); ?>...</td>
+                        <td>$<?php echo number_format($service['price'] ?? 0, 2); ?></td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-primary" onclick="editService(<?php echo $service['service_id']; ?>)">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger" onclick="deleteService(<?php echo $service['service_id']; ?>)">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    <?php endwhile; ?>
+                <?php else: ?>
+                    <tr>
+                        <td colspan="5" class="text-center">No services found</td>
+                    </tr>
+                <?php endif; ?>
+            </tbody>
+        </table>
+    </div>
 </div>
 
-<div class="admin-main-content">
-  <h1 style="color: #1a1a1a; margin-bottom: 20px;">Manage Services</h1>
-  
-  <div class="table-container">
-    <div class="table-header">
-      <h3>Available Services</h3>
-      <button class="btn btn-primary btn-sm" onclick="alert('Add Service feature coming soon')"><i class="fas fa-plus"></i> Add Service</button>
-    </div>
-    <div style="overflow-x: auto;">
-      <table class="table">
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Service Name</th>
-            <th>Description</th>
-            <th>Price</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          <?php
-          if ($servicesQuery && $servicesQuery->num_rows > 0) {
-            while ($service = $servicesQuery->fetch_assoc()) {
-              echo "<tr>
-                <td>#{$service['service_id']}</td>
-                <td>{$service['service_name']}</td>
-                <td>" . substr($service['description'], 0, 50) . "...</td>
-                <td>\${$service['price']}</td>
-                <td>
-                  <div class='action-buttons'>
-                    <button class='btn btn-primary btn-sm'>Edit</button>
-                    <button class='btn btn-danger btn-sm'>Delete</button>
-                  </div>
-                </td>
-              </tr>";
-            }
-          } else {
-            echo "<tr><td colspan='5' style='text-align: center; padding: 20px;'>No services found</td></tr>";
-          }
-          ?>
-        </tbody>
-      </table>
-    </div>
-  </div>
+<script>
+function editService(id) {
+    alert('Edit service ' + id);
+}
 
-</div>
+function deleteService(id) {
+    if (confirm('Are you sure you want to delete this service?')) {
+        alert('Delete service ' + id);
+    }
+}
+</script>
 
-<?php include __DIR__ . '/../includes/footer.php'; ?>
+<?php include __DIR__ . '/includes/admin_layout_footer.php'; ?>
