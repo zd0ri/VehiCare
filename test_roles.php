@@ -45,7 +45,7 @@ foreach ($permissions as $permission) {
 }
 
 echo "<h2>Test Links:</h2>";
-echo "<p><a href='/vehicare_db/admins/dashboard.php'>Admin Dashboard</a> (Admin only)</p>";
+echo "<p><a href='/vehicare_db/admins/index.php'>Admin Dashboard</a> (Admin only)</p>";
 echo "<p><a href='/vehicare_db/staff/dashboard.php'>Staff Dashboard</a> (Staff only)</p>";
 echo "<p><a href='/vehicare_db/client/dashboard.php'>Client Dashboard</a> (Client only)</p>";
 echo "<p><a href='/vehicare_db/403.php'>403 Page Test</a></p>";

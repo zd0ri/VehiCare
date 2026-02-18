@@ -187,7 +187,7 @@ http://localhost/vehicare_db/register.php
 - Status: http://localhost/vehicare_db/status.php
 
 ### Protected Pages
-- Admin Dashboard: /vehicare_db/admins/dashboard.php
+- Admin Dashboard: /vehicare_db/admins/index.php
 - Staff Dashboard: /vehicare_db/staff/dashboard.php
 - Client Dashboard: /vehicare_db/client/dashboard.php
 

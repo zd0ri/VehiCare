@@ -12,7 +12,7 @@ $id = isset($_GET['id']) ? intval($_GET['id']) : 0;
 
 if (!$type || !$id) {
     $_SESSION['error'] = "Invalid delete request";
-    header("Location: /vehicare_db/admins/dashboard.php");
+    header("Location: /vehicare_db/admins/index.php");
     exit;
 }
 
@@ -41,7 +41,7 @@ switch ($type) {
         break;
     default:
         $_SESSION['error'] = "Invalid type";
-        header("Location: /vehicare_db/admins/dashboard.php");
+        header("Location: /vehicare_db/admins/index.php");
         exit;
 }
 

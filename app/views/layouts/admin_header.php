@@ -5,15 +5,15 @@
  */
 
 // Ensure user is authenticated and has admin access
-require_once __DIR__ . '/../../config/database.php';
-require_once __DIR__ . '/../middleware/Auth.php';
-require_once __DIR__ . '/../middleware/RBAC.php';
+require_once __DIR__ . '/../../../includes/config.php';
+require_once __DIR__ . '/../../middleware/Auth.php';
+require_once __DIR__ . '/../../middleware/RBAC.php';
 
-$auth = new Auth();
-$rbac = new RBAC();
+$auth = new Auth($pdo);
+$rbac = new RBAC($pdo);
 
 // Check if user is logged in
-if (!$auth->isLoggedIn()) {
+if (!$auth->isAuthenticated()) {
     header('Location: /vehicare_db/login.php');
     exit;
 }
@@ -21,7 +21,7 @@ if (!$auth->isLoggedIn()) {
 $current_user = $auth->getCurrentUser();
 
 // Check if user has admin access (admin or staff roles)
-if (!$rbac->hasRole(['admin', 'staff'])) {
+if (!isset($_SESSION['user_role']) || !in_array($_SESSION['user_role'], ['admin', 'staff'])) {
     header('Location: /vehicare_db/client/dashboard.php');
     exit;
 }
@@ -32,7 +32,7 @@ $page_icon = $page_icon ?? 'fas fa-tachometer-alt';
 $breadcrumbs = $breadcrumbs ?? [];
 
 // CSRF Token for forms
-$csrf_token = generateCSRFToken();
+$csrf_token = generate_csrf_token();
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -79,7 +79,7 @@ $csrf_token = generateCSRFToken();
             <!-- Navigation Menu -->
             <ul class="sidebar-menu">
                 <!-- Dashboard -->
-                <li><a href="/vehicare_db/admins/dashboard.php" class="<?php echo basename($_SERVER['PHP_SELF']) === 'dashboard.php' ? 'active' : ''; ?>">
+                <li><a href="/vehicare_db/admins/index.php" class="<?php echo basename($_SERVER['PHP_SELF']) === 'index.php' ? 'active' : ''; ?>">
                     <i class="fas fa-tachometer-alt"></i>
                     <span class="menu-text">Dashboard</span>
                 </a></li>
@@ -140,7 +140,7 @@ $csrf_token = generateCSRFToken();
                     <span class="menu-text">Payments</span>
                 </a></li>
 
-                <?php if ($rbac->hasPermission('admin_full_access')): ?>
+                <?php if ($rbac->hasPermission($_SESSION['user_role'], 'admin.full_access')): ?>
                 <!-- Admin Only Section -->
                 <li class="menu-section">Administration</li>
                 <li><a href="/vehicare_db/admins/staff.php" class="<?php echo basename($_SERVER['PHP_SELF']) === 'staff.php' ? 'active' : ''; ?>">
@@ -211,12 +211,13 @@ $csrf_token = generateCSRFToken();
                     <a href="/vehicare_db/profile.php" class="user-info">
                         <div class="user-avatar">
                             <?php 
-                            $initials = substr($current_user['first_name'], 0, 1) . substr($current_user['last_name'], 0, 1);
+                            $name_parts = explode(' ', $current_user['full_name']);
+                            $initials = substr($name_parts[0], 0, 1) . (isset($name_parts[1]) ? substr($name_parts[1], 0, 1) : '');
                             echo htmlspecialchars($initials);
                             ?>
                         </div>
                         <div class="user-details">
-                            <div class="user-name"><?php echo htmlspecialchars($current_user['first_name'] . ' ' . $current_user['last_name']); ?></div>
+                            <div class="user-name"><?php echo htmlspecialchars($current_user['full_name']); ?></div>
                             <div class="user-role"><?php echo htmlspecialchars(ucfirst($current_user['role'])); ?></div>
                         </div>
                         <i class="fas fa-chevron-down"></i>

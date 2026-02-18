@@ -464,7 +464,7 @@ include __DIR__ . '/includes/admin_layout_header.php';
                 <h5>VehiCare</h5>
             </div>
             <ul class="sidebar-menu">
-                <li><a href="/vehicare_db/admins/dashboard.php"><i class="fas fa-chart-line"></i> Dashboard</a></li>
+                <li><a href="/vehicare_db/admins/index.php"><i class="fas fa-chart-line"></i> Dashboard</a></li>
                 <li><a href="/vehicare_db/admins/users.php" class="active"><i class="fas fa-users"></i> Users</a></li>
                 <li><a href="/vehicare_db/admins/clients.php"><i class="fas fa-user-tie"></i> Clients</a></li>
                 <li><a href="/vehicare_db/admins/vehicles.php"><i class="fas fa-car"></i> Vehicles</a></li>

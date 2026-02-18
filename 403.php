@@ -189,7 +189,7 @@ $user_role = getUserRole();
             <div class="error-actions">
                 <?php if ($current_user): ?>
                     <?php if ($user_role === 'admin'): ?>
-                        <a href="/vehicare_db/admins/dashboard.php" class="btn btn-primary">
+                        <a href="/vehicare_db/admins/index.php" class="btn btn-primary">
                             <i class="fas fa-tachometer-alt"></i>
                             Admin Dashboard
                         </a>

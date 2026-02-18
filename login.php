@@ -51,7 +51,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             // Redirect based on role
             $role = $login_result['user']['role'];
             if ($role === 'admin') {
-                header("Location: /vehicare_db/admins/dashboard.php");
+                header("Location: /vehicare_db/admins/index.php");
             } elseif ($role === 'staff') {
                 header("Location: /vehicare_db/staff/dashboard.php");
             } else {

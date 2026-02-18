@@ -21,8 +21,8 @@ class AuditLogger {
     const ACTION_SETTINGS_CHANGE = 'SETTINGS_CHANGE';
     
     public function __construct($pdo = null) {
-        global $pdo as $global_pdo;
-        $this->pdo = $pdo ?? $global_pdo;
+        // Use provided PDO, or fall back to global PDO from config
+        $this->pdo = $pdo ?? $GLOBALS['pdo'];
         $this->enabled = true;
         
         // Get current user ID from session
@@ -453,7 +453,10 @@ class AuditLogger {
 
 // Global audit logger instance
 if (!isset($GLOBALS['audit_logger'])) {
-    $GLOBALS['audit_logger'] = new AuditLogger();
+    // Use global PDO if available, otherwise skip initialization
+    if (isset($GLOBALS['pdo'])) {
+        $GLOBALS['audit_logger'] = new AuditLogger($GLOBALS['pdo']);
+    }
 }
 
 /**

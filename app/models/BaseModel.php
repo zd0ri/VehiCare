@@ -176,7 +176,18 @@ abstract class BaseModel {
         try {
             $sql = "SELECT COUNT(*) FROM {$this->table}";
             
-            if (!empty($where)) {
+            // Handle array-style where conditions
+            if (is_array($where)) {
+                $conditions = [];
+                $params = [];
+                foreach ($where as $key => $value) {
+                    $conditions[] = "{$key} = ?";
+                    $params[] = $value;
+                }
+                if (!empty($conditions)) {
+                    $sql .= " WHERE " . implode(' AND ', $conditions);
+                }
+            } elseif (!empty($where)) {
                 $sql .= " WHERE " . $where;
             }
             

@@ -12,7 +12,7 @@
 <body>
 <nav class="navbar navbar-expand-lg" style="background: linear-gradient(135deg, #1a3a52 0%, #2d5a7b 100%); box-shadow:0 2px 8px rgba(0,0,0,0.15);">
   <div class="container-fluid">
-    <a class="navbar-brand" href="/vehicare_db/admins/dashboard.php" style="color: #fff; font-weight: bold;"><i class="fas fa-car"></i> VehiCare Admin</a>
+    <a class="navbar-brand" href="/vehicare_db/admins/index.php" style="color: #fff; font-weight: bold;"><i class="fas fa-car"></i> VehiCare Admin</a>
     <form class="d-flex ms-auto" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>" method="GET">
       <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" name="search">
       <button class="btn btn-outline-light" type="submit"><i class="fas fa-search"></i></button>

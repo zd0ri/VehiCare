@@ -121,7 +121,7 @@
           <?php
           if (isset($_SESSION['user_id']) && isset($_SESSION['role'])) {
               if ($_SESSION['role'] === 'admin') {
-                  echo '<li class="nav-item"><a class="nav-link" href="/vehicare_db/admins/dashboard.php" style="color: #fff; padding: 8px 16px;">Dashboard</a></li>';
+                  echo '<li class="nav-item"><a class="nav-link" href="/vehicare_db/admins/index.php" style="color: #fff; padding: 8px 16px;">Dashboard</a></li>';
               } elseif ($_SESSION['role'] === 'client') {
                   echo '<li class="nav-item"><a class="nav-link" href="/vehicare_db/client/dashboard.php" style="color: #fff; padding: 8px 16px;">Dashboard</a></li>';
               } elseif ($_SESSION['role'] === 'staff') {

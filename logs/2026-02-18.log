@@ -1,0 +1,6 @@
+[2026-02-18 16:40:07] INFO: User logged in: admin@vehicare.com | Context: {"user_id":2,"ip":"::1"}
+[2026-02-18 16:40:07] ERROR: Failed to log audit: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'vehicare_db.audit_logs' doesn't exist
+[2026-02-18 16:56:52] INFO: User logged in: admin@vehicare.com | Context: {"user_id":2,"ip":"::1"}
+[2026-02-18 16:56:52] ERROR: Failed to log audit: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'vehicare_db.audit_logs' doesn't exist
+[2026-02-18 22:02:56] INFO: User logged in: dion@gmail.com | Context: {"user_id":23,"ip":"::1"}
+[2026-02-18 22:02:56] ERROR: Failed to log audit: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'vehicare_db.audit_logs' doesn't exist

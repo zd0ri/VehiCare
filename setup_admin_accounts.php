@@ -361,7 +361,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['create_accounts'])) {
                     <ol>
                         <li>Go to <a href="/vehicare_db/login.php">Login Page</a></li>
                         <li>Use the admin or staff credentials above to log in</li>
-                        <li>Access the <a href="/vehicare_db/admins/dashboard.php">Admin Dashboard</a></li>
+                        <li>Access the <a href="/vehicare_db/admins/index.php">Admin Dashboard</a></li>
                         <li>Start managing your VehiCare system</li>
                     </ol>
                 </div>
