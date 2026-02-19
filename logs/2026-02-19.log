@@ -1,0 +1,2 @@
+[2026-02-19 01:13:10] INFO: User logged in: dion@gmail.com | Context: {"user_id":23,"ip":"::1"}
+[2026-02-19 01:13:10] ERROR: Failed to log audit: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'vehicare_db.audit_logs' doesn't exist
